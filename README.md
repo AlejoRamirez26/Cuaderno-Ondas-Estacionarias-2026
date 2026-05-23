@@ -1,0 +1,1 @@
+# Cuaderno-Ondas-Estacionarias-2026
