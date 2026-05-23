@@ -1,0 +1,1761 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Oscar Alejandro Ramírez Espinosa, Jeny Maritza Mora Cardona">
+    <meta name="copyright" content="© 2026 Oscar Alejandro Ramírez Espinosa y Jeny Maritza Mora Cardona. Todos los derechos reservados.">
+    <meta name="description" content="Cuaderno Digital Interactivo: Ondas Estacionarias, Resonancia y Modos Normales. Aplicaciones en Ingeniería Industrial.">
+    <meta name="keywords" content="ondas estacionarias, resonancia, modos normales, guitarra acústica, física, ingeniería industrial, cuaderno interactivo">
+    <title>Cuaderno Digital Interactivo — Ondas Estacionarias</title>
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Lato:wght@300;400;700&family=Kalam:wght@400;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <!-- KaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- html2canvas for screenshot -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        /* ============================================================
+           ROOT VARIABLES & RESET
+        ============================================================ */
+        :root {
+            --ink: #1a1a2e;
+            --ink-light: #3d3d5c;
+            --paper: #fdfaf4;
+            --paper-dark: #f4efe3;
+            --paper-lined: #a8d4f5;
+            --spine-color: #c8a97a;
+            --accent: #c0392b;
+            --accent2: #2980b9;
+            --accent3: #27ae60;
+            --gold: #d4a017;
+            --shadow: rgba(0,0,0,0.25);
+            --ring: #555;
+            --flip-duration: 0.75s;
+            --font-display: 'Playfair Display', Georgia, serif;
+            --font-body: 'Lato', sans-serif;
+            --font-hand: 'Kalam', cursive;
+            --font-mono: 'Fira Code', monospace;
+        }
+        body.dark-mode {
+            --ink: #e8e0d0;
+            --ink-light: #c0b8a8;
+            --paper: #1e1e2e;
+            --paper-dark: #161622;
+            --paper-lined: #1a3a5c;
+            --spine-color: #6b4f2a;
+            --shadow: rgba(0,0,0,0.6);
+            --ring: #888;
+        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body {
+            width: 100%; height: 100vh; overflow: hidden;
+            background: #1a0a00 radial-gradient(ellipse at 50% 30%, #2c1a0a 0%, #0a0505 100%);
+            font-family: var(--font-body);
+            color: var(--ink);
+        }
+        h1,h2,h3,h4 { font-family: var(--font-display); color: var(--ink); }
+        p, li { font-size: 0.97rem; line-height: 1.75; text-align: justify; margin-bottom: 0.7rem; }
+
+        /* ============================================================
+           SPLASH / COVER SCREEN
+        ============================================================ */
+        #splash {
+            position: fixed; inset: 0; z-index: 9999;
+            background: linear-gradient(135deg, #1a0a00 0%, #2c0f04 40%, #0d0505 100%);
+            display: flex; align-items: center; justify-content: center;
+            flex-direction: column;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+        #splash.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+        .splash-inner {
+            text-align: center; padding: 40px;
+            border: 2px solid var(--gold);
+            border-radius: 4px;
+            max-width: 560px; width: 90%;
+            position: relative;
+            animation: splashIn 1s cubic-bezier(0.22,1,0.36,1) both;
+        }
+        @keyframes splashIn { from { opacity:0; transform: scale(0.88) translateY(30px);} to {opacity:1; transform: none;} }
+        .splash-deco { position: absolute; top: -1px; left: -1px; right: -1px; bottom: -1px; border: 8px solid transparent; background: linear-gradient(135deg, #d4a017, transparent 40%, transparent 60%, #d4a017) border-box; -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0); -webkit-mask-composite: destination-out; mask-composite: exclude; border-radius: 4px; pointer-events: none; }
+        .splash-title {
+            font-family: var(--font-display); font-size: 2.2rem; font-weight: 900;
+            color: var(--gold); line-height: 1.2; margin: 20px 0 8px;
+            text-shadow: 0 2px 20px rgba(212,160,23,0.4);
+        }
+        .splash-subtitle { font-family: var(--font-body); color: #c0a080; font-size: 0.95rem; margin-bottom: 20px; line-height: 1.5; }
+        .splash-authors { font-family: var(--font-display); font-style: italic; color: #e8d0a0; font-size: 1rem; margin-bottom: 6px; }
+        .splash-year { color: #888; font-size: 0.85rem; margin-bottom: 28px; }
+        .splash-waves { width: 100%; height: 60px; margin-bottom: 20px; }
+        #btnOpen {
+            background: var(--gold); color: #1a0a00; border: none;
+            padding: 14px 40px; font-family: var(--font-display); font-weight: 700;
+            font-size: 1.05rem; letter-spacing: 1px; border-radius: 2px;
+            cursor: pointer; transition: all 0.3s; box-shadow: 0 4px 20px rgba(212,160,23,0.3);
+        }
+        #btnOpen:hover { background: #e8b820; transform: translateY(-2px); box-shadow: 0 8px 30px rgba(212,160,23,0.5); }
+        .splash-copyright { color: #555; font-size: 0.75rem; margin-top: 20px; }
+
+        /* ============================================================
+           TOOLBAR
+        ============================================================ */
+        #toolbar {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 500;
+            background: rgba(26,10,0,0.92); backdrop-filter: blur(8px);
+            border-bottom: 1px solid rgba(212,160,23,0.3);
+            display: flex; align-items: center; gap: 6px;
+            padding: 8px 16px; flex-wrap: wrap;
+        }
+        .tb-brand { font-family: var(--font-display); color: var(--gold); font-weight: 700; font-size: 0.95rem; margin-right: 8px; white-space: nowrap; }
+        .tb-sep { width: 1px; height: 24px; background: rgba(255,255,255,0.2); margin: 0 4px; }
+        .tb-btn {
+            background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);
+            color: #e0d4c0; padding: 5px 12px; border-radius: 20px;
+            cursor: pointer; font-size: 0.78rem; font-family: var(--font-body);
+            display: flex; align-items: center; gap: 4px;
+            transition: all 0.2s; white-space: nowrap;
+        }
+        .tb-btn:hover { background: rgba(212,160,23,0.2); border-color: var(--gold); color: var(--gold); }
+        .tb-btn.active { background: var(--gold); color: #1a0a00; border-color: var(--gold); }
+        .tb-spacer { flex: 1; }
+        #progress-bar-wrap { position: fixed; top: 41px; left: 0; right: 0; height: 3px; z-index: 499; background: rgba(255,255,255,0.05); }
+        #progress-bar { height: 100%; background: linear-gradient(to right, var(--gold), var(--accent)); transition: width 0.4s; width: 10%; }
+
+        /* ============================================================
+           MAIN BOOK WRAPPER
+        ============================================================ */
+        #main {
+            position: fixed; inset: 0; top: 44px;
+            display: flex; align-items: center; justify-content: center;
+            padding: 20px 20px 70px;
+        }
+        .notebook-wrapper {
+            position: relative;
+            width: min(90vw, 1400px);
+            height: min(82vh, 820px);
+        }
+        .notebook {
+            width: 100%; height: 100%;
+            display: flex; position: relative;
+            transform-style: preserve-3d;
+            filter: drop-shadow(0 20px 60px rgba(0,0,0,0.7));
+        }
+
+        /* ============================================================
+           SPINE
+        ============================================================ */
+        .spine {
+            position: absolute; left: 50%; top: 0; bottom: 0;
+            width: 44px; transform: translateX(-50%);
+            background: linear-gradient(to right, #b89060, #f5e8c8, #d4a040, #f5e8c8, #b89060);
+            z-index: 20;
+            display: flex; flex-direction: column;
+            justify-content: space-evenly; align-items: center; padding: 20px 0;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.3), 0 0 10px rgba(0,0,0,0.5);
+        }
+        .ring {
+            width: 46px; height: 11px; border-radius: 6px;
+            background: linear-gradient(to bottom, #888, #444, #222, #555, #888);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.6), inset 0 1px 2px rgba(255,255,255,0.2);
+        }
+        .spine-title {
+            writing-mode: vertical-rl; text-orientation: mixed;
+            font-family: var(--font-display); font-size: 0.65rem; color: #6b4222;
+            letter-spacing: 2px; font-weight: 700; text-transform: uppercase;
+            user-select: none;
+        }
+
+        /* ============================================================
+           PAGES
+        ============================================================ */
+        .page-container {
+            flex: 1; height: 100%; position: relative;
+            transform-style: preserve-3d; perspective: 2500px;
+        }
+        .page {
+            width: 50%; height: 100%;
+            position: absolute; top: 0;
+            padding: 36px 50px 56px;
+            overflow-y: auto; overflow-x: hidden;
+            background-color: var(--paper);
+            backface-visibility: hidden;
+            border-radius: 3px;
+            transition: box-shadow 0.3s;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(150,130,100,0.4) transparent;
+        }
+        .page::-webkit-scrollbar { width: 4px; }
+        .page::-webkit-scrollbar-thumb { background: rgba(150,130,100,0.4); border-radius: 2px; }
+
+        .page-left {
+            left: 0;
+            transform-origin: right center;
+            transform: rotateY(0deg); opacity: 0; z-index: 1;
+            border-right: 1px solid rgba(0,0,0,0.08);
+            box-shadow: inset -6px 0 20px rgba(0,0,0,0.06), -2px 0 8px rgba(0,0,0,0.2);
+        }
+        .page-right {
+            left: 50%;
+            transform-origin: left center;
+            transform: rotateY(0deg); opacity: 0; z-index: 1;
+            border-left: 1px solid rgba(0,0,0,0.08);
+            box-shadow: inset 6px 0 20px rgba(0,0,0,0.06), 2px 0 8px rgba(0,0,0,0.2);
+        }
+        .page-left.active { opacity: 1; z-index: 5; }
+        .page-right.active { opacity: 1; z-index: 5; }
+
+        /* Page textures */
+        .paper-lined {
+            background-image: repeating-linear-gradient(transparent, transparent 31px, var(--paper-lined) 31px, var(--paper-lined) 32px);
+            line-height: 32px; background-attachment: local;
+        }
+        .paper-lined.page-left::after {
+            content: ''; position: absolute; right: 46px; top: 0; bottom: 0;
+            width: 2px; background: rgba(255,120,120,0.4); pointer-events: none;
+        }
+        .paper-lined.page-right::after {
+            content: ''; position: absolute; left: 46px; top: 0; bottom: 0;
+            width: 2px; background: rgba(255,120,120,0.4); pointer-events: none;
+        }
+        .paper-graph {
+            background-color: var(--paper);
+            background-image:
+                linear-gradient(rgba(150,180,220,0.3) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(150,180,220,0.3) 1px, transparent 1px),
+                linear-gradient(rgba(150,180,220,0.12) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(150,180,220,0.12) 1px, transparent 1px);
+            background-size: 50px 50px, 50px 50px, 10px 10px, 10px 10px;
+        }
+        .paper-plain { background: var(--paper); }
+
+        /* Watermark */
+        .page::before {
+            content: 'Ramírez Espinosa · Mora Cardona';
+            position: absolute; bottom: 50%; left: 50%;
+            transform: translate(-50%, 50%) rotate(-30deg);
+            font-family: var(--font-display); font-size: 1.1rem;
+            color: rgba(100,80,50,0.04); white-space: nowrap;
+            pointer-events: none; z-index: 0; user-select: none;
+            letter-spacing: 2px;
+        }
+
+        /* Page number */
+        .page-number {
+            position: absolute; bottom: 18px;
+            font-family: var(--font-body); font-size: 0.8rem;
+            color: rgba(100,80,60,0.6); font-style: italic;
+        }
+        .page-left .page-number { left: 28px; }
+        .page-right .page-number { right: 28px; }
+        .page-footer {
+            position: absolute; bottom: 18px; left: 50%; transform: translateX(-50%);
+            font-size: 0.65rem; color: rgba(100,80,60,0.4);
+            white-space: nowrap; font-family: var(--font-body);
+        }
+
+        /* ============================================================
+           FLIP ANIMATIONS
+        ============================================================ */
+        @keyframes flipNextOut {
+            0%   { transform: rotateY(0deg); opacity: 1; z-index: 10; }
+            49%  { transform: rotateY(-92deg); opacity: 1; z-index: 10; }
+            50%  { transform: rotateY(-92deg); opacity: 0; z-index: 1; }
+            100% { transform: rotateY(-180deg); opacity: 0; z-index: 1; }
+        }
+        @keyframes flipNextIn {
+            0%   { transform: rotateY(180deg); opacity: 0; z-index: 1; }
+            49%  { transform: rotateY(92deg); opacity: 0; z-index: 1; }
+            50%  { transform: rotateY(92deg); opacity: 1; z-index: 10; }
+            100% { transform: rotateY(0deg); opacity: 1; z-index: 10; }
+        }
+        @keyframes flipPrevOut {
+            0%   { transform: rotateY(0deg); opacity: 1; z-index: 10; }
+            49%  { transform: rotateY(92deg); opacity: 1; z-index: 10; }
+            50%  { transform: rotateY(92deg); opacity: 0; z-index: 1; }
+            100% { transform: rotateY(180deg); opacity: 0; z-index: 1; }
+        }
+        @keyframes flipPrevIn {
+            0%   { transform: rotateY(-180deg); opacity: 0; z-index: 1; }
+            49%  { transform: rotateY(-92deg); opacity: 0; z-index: 1; }
+            50%  { transform: rotateY(-92deg); opacity: 1; z-index: 10; }
+            100% { transform: rotateY(0deg); opacity: 1; z-index: 10; }
+        }
+        .anim-next-out { animation: flipNextOut var(--flip-duration) cubic-bezier(0.4,0,0.2,1) forwards; }
+        .anim-next-in  { animation: flipNextIn  var(--flip-duration) cubic-bezier(0.4,0,0.2,1) forwards; }
+        .anim-prev-out { animation: flipPrevOut var(--flip-duration) cubic-bezier(0.4,0,0.2,1) forwards; }
+        .anim-prev-in  { animation: flipPrevIn  var(--flip-duration) cubic-bezier(0.4,0,0.2,1) forwards; }
+
+        /* ============================================================
+           NAVIGATION BUTTONS
+        ============================================================ */
+        .nav-btn {
+            position: absolute; bottom: -56px;
+            background: linear-gradient(135deg, #2c1a0a, #1a0a00);
+            color: #d4a017; border: 1px solid rgba(212,160,23,0.4);
+            padding: 10px 28px; border-radius: 4px;
+            cursor: pointer; font-family: var(--font-body); font-weight: 700;
+            font-size: 0.85rem; letter-spacing: 0.5px;
+            transition: all 0.25s; z-index: 100;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+        .nav-btn:hover:not(:disabled) {
+            background: linear-gradient(135deg, #3d2a14, #2c1a0a);
+            border-color: var(--gold); color: var(--gold);
+            transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.6);
+        }
+        .nav-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+        #btn-prev { left: 0; }
+        #btn-next { right: 0; }
+        #btn-index { left: 50%; transform: translateX(-50%); padding: 10px 20px; font-size: 0.78rem; }
+
+        /* ============================================================
+           TYPOGRAPHY — Page Content
+        ============================================================ */
+        .page-title {
+            font-family: var(--font-hand); font-size: 2.4rem; color: var(--ink);
+            text-align: center; margin: 16px 0 8px; line-height: 1.2;
+        }
+        .page-subtitle { font-family: var(--font-body); font-size: 0.9rem; color: var(--ink-light); text-align: center; margin-bottom: 12px; }
+        .page-author { font-family: var(--font-display); font-style: italic; text-align: center; color: var(--ink-light); font-size: 0.92rem; margin-bottom: 8px; }
+        h2 { font-size: 1.3rem; margin: 18px 0 10px; border-bottom: 2px solid var(--accent); padding-bottom: 4px; color: var(--accent); }
+        h3 { font-size: 1.05rem; margin: 14px 0 8px; color: var(--accent2); }
+        h4 { font-size: 0.95rem; margin: 10px 0 6px; color: var(--ink-light); }
+        .highlight { background: rgba(212,160,23,0.22); padding: 1px 5px; border-radius: 3px; }
+        .highlight-red { background: rgba(192,57,43,0.15); padding: 1px 5px; border-radius: 3px; }
+        .highlight-blue { background: rgba(41,128,185,0.15); padding: 1px 5px; border-radius: 3px; }
+
+        /* Formula box */
+        .formula-box {
+            background: var(--paper-dark); border-left: 4px solid var(--accent2);
+            border-radius: 0 6px 6px 0; padding: 12px 18px; margin: 12px 0;
+            font-size: 1.15rem; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        /* Note box */
+        .note-box {
+            background: rgba(212,160,23,0.1); border: 1px solid rgba(212,160,23,0.4);
+            border-radius: 6px; padding: 10px 14px; margin: 12px 0;
+            font-size: 0.88rem;
+        }
+        .note-box strong { color: var(--gold); }
+        /* Warning box */
+        .warn-box {
+            background: rgba(192,57,43,0.08); border: 1px solid rgba(192,57,43,0.35);
+            border-radius: 6px; padding: 10px 14px; margin: 12px 0; font-size: 0.88rem;
+        }
+        .warn-box strong { color: var(--accent); }
+
+        /* Table */
+        table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 0.88rem; }
+        th { background: var(--ink); color: var(--paper); padding: 7px 10px; font-family: var(--font-body); font-weight: 700; }
+        td { border-bottom: 1px solid rgba(0,0,0,0.08); padding: 6px 10px; }
+        tr:nth-child(even) td { background: rgba(0,0,0,0.03); }
+
+        /* Inline SVG illustrations */
+        .svg-illus { width: 100%; display: block; margin: 12px auto; border-radius: 6px; }
+
+        /* ============================================================
+           DASHBOARD / SIMULATION STYLES
+        ============================================================ */
+        .dashboard {
+            background: rgba(255,255,255,0.85); border: 1.5px solid #c8b89a;
+            border-radius: 8px; padding: 16px; margin: 12px 0;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+        }
+        body.dark-mode .dashboard { background: rgba(30,30,50,0.85); border-color: #444; }
+        .telemetry { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 14px; }
+        .stat-box {
+            flex: 1; min-width: 80px; background: var(--paper-dark);
+            padding: 8px 10px; border-radius: 6px; text-align: center;
+            border-top: 3px solid var(--accent2);
+        }
+        .stat-val { font-size: 1.2rem; font-weight: 700; font-family: var(--font-mono); color: var(--ink); }
+        .stat-lbl { font-size: 0.68rem; color: var(--ink-light); text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+        .control-group { margin-bottom: 12px; }
+        .control-group label {
+            display: flex; justify-content: space-between;
+            font-family: var(--font-body); font-weight: 700;
+            font-size: 0.82rem; margin-bottom: 4px; color: var(--ink);
+        }
+        input[type=range] { width: 100%; accent-color: var(--accent2); cursor: pointer; }
+        .harmonic-btn-group { display: flex; gap: 5px; margin-top: 8px; }
+        .harmonic-btn {
+            flex: 1; padding: 6px 0;
+            background: var(--accent2); color: white;
+            border: none; border-radius: 4px; cursor: pointer;
+            font-weight: 700; font-size: 0.8rem; transition: all 0.2s;
+        }
+        .harmonic-btn:hover, .harmonic-btn.selected { background: #1a6090; box-shadow: inset 0 2px 4px rgba(0,0,0,0.3); }
+        .chart-container { width: 100%; height: 240px; position: relative; margin-bottom: 14px; background: rgba(255,255,255,0.7); border-radius: 6px; padding: 8px; border: 1px solid #ddd; }
+        body.dark-mode .chart-container { background: rgba(20,20,35,0.7); border-color: #333; }
+        #simCanvas { width: 100%; height: 320px; background: #fff; border-radius: 8px; border: 1px solid #ccc; margin-top: 12px; display: block; }
+        #guitarCanvas { width: 100%; height: 400px; background: #1a1a2e; border-radius: 8px; border: 1px solid #333; margin-top: 12px; cursor: crosshair; display: block; }
+
+        /* ============================================================
+           INDEX PAGE
+        ============================================================ */
+        .index-entry {
+            display: flex; align-items: center; gap: 10px;
+            padding: 8px 12px; margin-bottom: 6px;
+            border-radius: 4px; cursor: pointer;
+            transition: background 0.2s;
+            border-left: 3px solid transparent;
+        }
+        .index-entry:hover { background: rgba(212,160,23,0.12); border-left-color: var(--gold); }
+        .index-num { font-family: var(--font-mono); font-size: 0.8rem; color: var(--ink-light); min-width: 28px; }
+        .index-title { font-size: 0.92rem; font-weight: 700; flex: 1; }
+        .index-dots { flex: 1; border-bottom: 1px dotted rgba(0,0,0,0.2); margin: 0 8px; }
+        .index-page { font-family: var(--font-mono); font-size: 0.8rem; color: var(--ink-light); }
+
+        /* ============================================================
+           CHATBOT
+        ============================================================ */
+        #chatbot { position: fixed; bottom: 80px; right: 20px; z-index: 600; }
+        .chat-fab {
+            width: 52px; height: 52px; border-radius: 50%;
+            background: var(--accent); color: white;
+            border: 2px solid white; font-size: 1.4rem;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+            transition: transform 0.3s cubic-bezier(0.175,0.885,0.32,1.275);
+        }
+        .chat-fab:hover { transform: scale(1.1); }
+        .chat-panel {
+            width: 320px; height: 420px;
+            background: white; border-radius: 10px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+            display: none; flex-direction: column;
+            margin-bottom: 12px; border: 1px solid #ddd;
+            overflow: hidden;
+        }
+        .chat-panel.open { display: flex; }
+        .chat-header { background: var(--ink); color: white; padding: 12px 14px; display: flex; justify-content: space-between; align-items: center; font-family: var(--font-body); font-size: 0.9rem; }
+        .chat-body { flex: 1; padding: 12px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; background: #fdfbf7; font-size: 0.88rem; }
+        .msg { padding: 8px 12px; border-radius: 14px; max-width: 85%; line-height: 1.4; }
+        .msg-ai { background: var(--accent2); color: white; align-self: flex-start; border-bottom-left-radius: 2px; }
+        .msg-user { background: #ecf0f1; color: #333; align-self: flex-end; border-bottom-right-radius: 2px; }
+        .chat-input-row { display: flex; padding: 8px; border-top: 1px solid #ddd; background: white; gap: 6px; }
+        .chat-input-row input { flex: 1; padding: 7px 10px; border: 1px solid #ccc; border-radius: 20px; font-size: 0.85rem; outline: none; }
+        .chat-input-row button { background: var(--accent); color: white; border: none; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; font-size: 1rem; }
+
+        /* ============================================================
+           SEARCH OVERLAY
+        ============================================================ */
+        #searchOverlay {
+            position: fixed; inset: 0; z-index: 800;
+            background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
+            display: none; align-items: flex-start; justify-content: center;
+            padding-top: 80px;
+        }
+        #searchOverlay.open { display: flex; }
+        .search-box { background: white; border-radius: 8px; padding: 20px; width: min(500px, 90vw); box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+        .search-box input { width: 100%; padding: 10px 14px; border: 2px solid var(--accent2); border-radius: 6px; font-size: 1rem; outline: none; }
+        #searchResults { margin-top: 12px; max-height: 300px; overflow-y: auto; }
+        .search-result { padding: 10px 12px; border-radius: 4px; cursor: pointer; border-left: 3px solid transparent; margin-bottom: 4px; font-size: 0.9rem; }
+        .search-result:hover { background: rgba(41,128,185,0.1); border-left-color: var(--accent2); }
+        .search-result .sr-pg { font-size: 0.75rem; color: #888; margin-top: 2px; }
+
+        /* ============================================================
+           NOTES PANEL
+        ============================================================ */
+        #notesPanel {
+            position: fixed; right: 0; top: 44px; bottom: 0; width: 260px;
+            background: #fef9e7; border-left: 1px solid rgba(212,160,23,0.4);
+            transform: translateX(100%); transition: transform 0.3s;
+            z-index: 400; display: flex; flex-direction: column; padding: 16px;
+        }
+        #notesPanel.open { transform: translateX(0); }
+        #notesPanel h4 { margin-bottom: 10px; font-family: var(--font-display); }
+        #notesArea { flex: 1; width: 100%; resize: none; border: 1px solid #ddd; border-radius: 4px; padding: 10px; font-family: var(--font-hand); font-size: 0.95rem; line-height: 1.6; background: #fefefe; outline: none; }
+
+        /* ============================================================
+           READING TIMER
+        ============================================================ */
+        #timerWidget {
+            position: fixed; bottom: 80px; left: 20px; z-index: 400;
+            background: rgba(26,10,0,0.85); border: 1px solid var(--gold);
+            border-radius: 6px; padding: 8px 14px;
+            font-family: var(--font-mono); color: var(--gold); font-size: 0.85rem;
+            display: none;
+        }
+        #timerWidget.visible { display: block; }
+
+        /* ============================================================
+           DARK MODE toggle
+        ============================================================ */
+        body.dark-mode .page { background-color: var(--paper); color: var(--ink); }
+        body.dark-mode h1, body.dark-mode h2, body.dark-mode h3, body.dark-mode h4 { color: var(--ink); }
+        body.dark-mode .note-box { background: rgba(212,160,23,0.08); }
+        body.dark-mode table th { background: #333; }
+        body.dark-mode .index-entry:hover { background: rgba(212,160,23,0.1); }
+
+        /* ============================================================
+           RESPONSIVE
+        ============================================================ */
+        @media (max-width: 768px) {
+            .notebook-wrapper { width: 98vw; height: 78vh; }
+            .page { padding: 20px 24px 50px; }
+            .page-left, .page-right { width: 100%; left: 0; }
+            .page-left { display: none; }
+            .page-right.active { display: block; }
+            .spine { display: none; }
+            p, li { font-size: 0.88rem; }
+            h2 { font-size: 1.1rem; }
+        }
+
+        /* ============================================================
+           UTILITY
+        ============================================================ */
+        .divider { border: none; border-top: 1px dashed rgba(0,0,0,0.15); margin: 14px 0; }
+        ul, ol { padding-left: 1.5rem; }
+        li { margin-bottom: 4px; }
+        .tag { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 700; margin-right: 4px; }
+        .tag-red { background: rgba(192,57,43,0.15); color: var(--accent); }
+        .tag-blue { background: rgba(41,128,185,0.15); color: var(--accent2); }
+        .tag-green { background: rgba(39,174,96,0.15); color: var(--accent3); }
+    </style>
+</head>
+<body>
+
+<!-- ===============================================================
+     SPLASH SCREEN
+================================================================ -->
+<div id="splash">
+    <div class="splash-inner">
+        <div class="splash-deco"></div>
+        <!-- Animated SVG waves -->
+        <svg class="splash-waves" viewBox="0 0 500 60">
+            <path d="M0 30 Q62.5 10 125 30 T250 30 T375 30 T500 30" fill="none" stroke="#d4a017" stroke-width="2" opacity="0.8">
+                <animate attributeName="d" values="M0 30 Q62.5 10 125 30 T250 30 T375 30 T500 30;M0 30 Q62.5 50 125 30 T250 30 T375 30 T500 30;M0 30 Q62.5 10 125 30 T250 30 T375 30 T500 30" dur="3s" repeatCount="indefinite"/>
+            </path>
+            <path d="M0 30 Q62.5 50 125 30 T250 30 T375 30 T500 30" fill="none" stroke="#c0392b" stroke-width="1.5" opacity="0.5">
+                <animate attributeName="d" values="M0 30 Q62.5 50 125 30 T250 30 T375 30 T500 30;M0 30 Q62.5 10 125 30 T250 30 T375 30 T500 30;M0 30 Q62.5 50 125 30 T250 30 T375 30 T500 30" dur="2.3s" repeatCount="indefinite"/>
+            </path>
+            <path d="M0 30 Q62.5 15 125 30 T250 30 T375 30 T500 30" fill="none" stroke="#2980b9" stroke-width="1" opacity="0.4">
+                <animate attributeName="d" values="M0 30 Q62.5 15 125 30 T250 30 T375 30 T500 30;M0 30 Q62.5 45 125 30 T250 30 T375 30 T500 30;M0 30 Q62.5 15 125 30 T250 30 T375 30 T500 30" dur="1.8s" repeatCount="indefinite"/>
+            </path>
+        </svg>
+        <div class="splash-title">Ondas Estacionarias:<br>Resonancia y Modos Normales</div>
+        <div class="splash-subtitle">Aplicaciones en Instrumentos Musicales,<br>Estructuras y Sistemas Vibratorios — Ingeniería Industrial</div>
+        <div class="splash-authors">Oscar Alejandro Ramírez Espinosa<br>Jeny Maritza Mora Cardona</div>
+        <div class="splash-year">Cuaderno Digital Interactivo · 2026</div>
+        <button id="btnOpen" onclick="openNotebook()">📖 Abrir Cuaderno</button>
+        <div class="splash-copyright">© 2026 Oscar Alejandro Ramírez Espinosa y Jeny Maritza Mora Cardona.<br>Todos los derechos reservados.</div>
+    </div>
+</div>
+
+<!-- ===============================================================
+     TOOLBAR
+================================================================ -->
+<div id="toolbar">
+    <span class="tb-brand">📚 Cuaderno Digital</span>
+    <div class="tb-sep"></div>
+    <button class="tb-btn" onclick="goToSpread(-1)" id="tb-prev">◀ Anterior</button>
+    <button class="tb-btn" onclick="goToIndex()" title="Ir al índice">📋 Índice</button>
+    <button class="tb-btn" onclick="goToSpread(1)" id="tb-next">Siguiente ▶</button>
+    <div class="tb-sep"></div>
+    <button class="tb-btn" onclick="toggleSearch()">🔍 Buscar</button>
+    <button class="tb-btn" onclick="toggleNotes()">📝 Notas</button>
+    <button class="tb-btn" onclick="toggleTimer()">⏱ Tiempo</button>
+    <div class="tb-sep"></div>
+    <button class="tb-btn" onclick="toggleDark()" id="btn-dark">🌙 Modo Oscuro</button>
+    <button class="tb-btn" onclick="printNotebook()">🖨 Imprimir</button>
+    <button class="tb-btn" onclick="takeScreenshot()">📸 Captura</button>
+    <div class="tb-spacer"></div>
+    <span style="font-size:0.72rem; color:#886; font-family:var(--font-body);" id="pgIndicator">Pág 1 de 12</span>
+</div>
+<div id="progress-bar-wrap"><div id="progress-bar"></div></div>
+
+<!-- ===============================================================
+     MAIN BOOK
+================================================================ -->
+<div id="main">
+<div class="notebook-wrapper">
+<div class="notebook" id="notebook-canvas">
+    <div class="spine" id="spine-rings">
+        <span class="spine-title">Ondas · 2026</span>
+    </div>
+
+    <div class="page-container">
+
+        <!-- =========================================================
+             SPREAD 0 — PORTADA + CRÉDITOS
+        ========================================================= -->
+        <div class="page page-left paper-plain active" id="p0L" style="background: linear-gradient(160deg, #1a0a00 0%, #2c1200 60%, #0d0505 100%); display:flex; flex-direction:column; align-items:center; justify-content:center;">
+            <svg viewBox="0 0 300 300" width="220" style="margin-bottom:16px;">
+                <!-- Abstract wave circle -->
+                <circle cx="150" cy="150" r="130" fill="none" stroke="rgba(212,160,23,0.3)" stroke-width="1"/>
+                <circle cx="150" cy="150" r="110" fill="none" stroke="rgba(212,160,23,0.2)" stroke-width="1"/>
+                <!-- Wave patterns -->
+                <path d="M20 150 Q75 90 150 150 T280 150" fill="none" stroke="#d4a017" stroke-width="2.5" opacity="0.9">
+                    <animate attributeName="d" values="M20 150 Q75 90 150 150 T280 150;M20 150 Q75 210 150 150 T280 150;M20 150 Q75 90 150 150 T280 150" dur="3s" repeatCount="indefinite"/>
+                </path>
+                <path d="M20 150 Q75 120 150 150 T280 150" fill="none" stroke="#c0392b" stroke-width="1.5" opacity="0.7">
+                    <animate attributeName="d" values="M20 150 Q75 120 150 150 T280 150;M20 150 Q75 180 150 150 T280 150;M20 150 Q75 120 150 150 T280 150" dur="2s" repeatCount="indefinite"/>
+                </path>
+                <path d="M20 150 Q75 100 150 150 T280 150" fill="none" stroke="#2980b9" stroke-width="1" opacity="0.6">
+                    <animate attributeName="d" values="M20 150 Q75 100 150 150 T280 150;M20 150 Q75 200 150 150 T280 150;M20 150 Q75 100 150 150 T280 150" dur="2.5s" repeatCount="indefinite"/>
+                </path>
+                <text x="150" y="270" text-anchor="middle" fill="#d4a017" font-family="Lato,sans-serif" font-size="11" opacity="0.6">f = n·v/(2L)</text>
+            </svg>
+            <div style="font-family:'Playfair Display',serif; color:#d4a017; font-size:1.9rem; font-weight:900; text-align:center; line-height:1.2;">Ondas Estacionarias</div>
+            <div style="color:#c0a080; font-size:0.82rem; text-align:center; margin:10px 0 20px; line-height:1.5;">Resonancia y Modos Normales<br><span style="color:#888;">Ingeniería Industrial · 2026</span></div>
+            <div style="color:rgba(212,160,23,0.5); font-size:0.7rem; text-align:center; border-top: 1px solid rgba(212,160,23,0.2); padding-top:10px; width:80%;">PORTADA</div>
+            <div class="page-number" style="color:rgba(212,160,23,0.4);">i</div>
+        </div>
+
+        <div class="page page-right paper-plain active" id="p0R" style="display:flex; flex-direction:column; justify-content:center;">
+            <div style="border:2px solid rgba(212,160,23,0.4); border-radius:4px; padding:24px; margin:20px; text-align:center;">
+                <div style="font-family:'Playfair Display',serif; font-size:1.6rem; font-weight:700; color:var(--accent); margin-bottom:16px;">Créditos</div>
+                <div style="font-family:'Playfair Display',serif; font-style:italic; font-size:1.05rem; margin-bottom:4px;">Oscar Alejandro Ramírez Espinosa</div>
+                <div style="font-family:'Playfair Display',serif; font-style:italic; font-size:1.05rem; margin-bottom:20px;">Jeny Maritza Mora Cardona</div>
+                <hr style="border:none; border-top:1px solid rgba(0,0,0,0.1); margin-bottom:16px;">
+                <p style="font-size:0.82rem; color:var(--ink-light); text-align:center; line-height:1.7;">
+                    Cuaderno digital interactivo desarrollado para el estudio de <strong>Ondas Estacionarias</strong> en el programa de Ingeniería Industrial.<br><br>
+                    El material incluye fundamentos teóricos, simulaciones interactivas y aplicaciones prácticas en sistemas físicos reales.
+                </p>
+                <hr style="border:none; border-top:1px solid rgba(0,0,0,0.1); margin:16px 0;">
+                <div style="font-size:0.75rem; color:var(--ink-light);">© 2026 Oscar Alejandro Ramírez Espinosa y Jeny Maritza Mora Cardona.<br>Todos los derechos reservados.<br><br>Prohibida la reproducción total o parcial sin autorización expresa de los autores.</div>
+            </div>
+            <div class="page-number">ii</div>
+        </div>
+
+        <!-- =========================================================
+             SPREAD 1 — ÍNDICE + PRESENTACIÓN
+        ========================================================= -->
+        <div class="page page-left paper-lined" id="p1L">
+            <h2 style="margin-top:8px;">Índice de Contenidos</h2>
+
+            <div class="index-entry" onclick="goToPage(4)">
+                <span class="index-num">01</span>
+                <span class="index-title">Principios de Formación</span>
+                <span class="index-dots"></span>
+                <span class="index-page">1</span>
+            </div>
+            <div class="index-entry" onclick="goToPage(4)">
+                <span class="index-num">02</span>
+                <span class="index-title">Nodos y Antinodos</span>
+                <span class="index-dots"></span>
+                <span class="index-page">2</span>
+            </div>
+            <div class="index-entry" onclick="goToPage(5)">
+                <span class="index-num">03</span>
+                <span class="index-title">Ecuaciones Fundamentales</span>
+                <span class="index-dots"></span>
+                <span class="index-page">3</span>
+            </div>
+            <div class="index-entry" onclick="goToPage(5)">
+                <span class="index-num">04</span>
+                <span class="index-title">Diagramas Modales</span>
+                <span class="index-dots"></span>
+                <span class="index-page">4</span>
+            </div>
+            <div class="index-entry" onclick="goToPage(6)">
+                <span class="index-num">05</span>
+                <span class="index-title">Panel de Control Teórico</span>
+                <span class="index-dots"></span>
+                <span class="index-page">5</span>
+            </div>
+            <div class="index-entry" onclick="goToPage(6)">
+                <span class="index-num">06</span>
+                <span class="index-title">Simulación Analítica</span>
+                <span class="index-dots"></span>
+                <span class="index-page">6</span>
+            </div>
+            <div class="index-entry" onclick="goToPage(7)">
+                <span class="index-num">07</span>
+                <span class="index-title">Telemetría de Amplitudes</span>
+                <span class="index-dots"></span>
+                <span class="index-page">7</span>
+            </div>
+            <div class="index-entry" onclick="goToPage(7)">
+                <span class="index-num">08</span>
+                <span class="index-title">Espectro Modal</span>
+                <span class="index-dots"></span>
+                <span class="index-page">8</span>
+            </div>
+            <div class="index-entry" onclick="goToPage(8)">
+                <span class="index-num">09</span>
+                <span class="index-title">Aplicación: Guitarra Acústica</span>
+                <span class="index-dots"></span>
+                <span class="index-page">9</span>
+            </div>
+            <div class="index-entry" onclick="goToPage(8)">
+                <span class="index-num">10</span>
+                <span class="index-title">Sintetizador Físico Interactivo</span>
+                <span class="index-dots"></span>
+                <span class="index-page">10</span>
+            </div>
+            <div class="index-entry" onclick="goToPage(9)">
+                <span class="index-num">11</span>
+                <span class="index-title">Aplicaciones Industriales</span>
+                <span class="index-dots"></span>
+                <span class="index-page">11</span>
+            </div>
+            <div class="index-entry" onclick="goToPage(9)">
+                <span class="index-num">12</span>
+                <span class="index-title">Autoevaluación y Referencias</span>
+                <span class="index-dots"></span>
+                <span class="index-page">12</span>
+            </div>
+
+            <div class="page-number">iii</div>
+            <div class="page-footer">© 2026 Ramírez Espinosa · Mora Cardona</div>
+        </div>
+
+        <div class="page page-right paper-lined" id="p1R">
+            <h1 class="page-title">Ondas Estacionarias:<br>Resonancia y Modos Normales</h1>
+            <p class="page-author">Oscar Alejandro Ramírez Espinosa<br>Jeny Maritza Mora Cardona</p>
+            <p class="page-subtitle">Aplicaciones en Instrumentos Musicales, Estructuras y Sistemas Vibratorios · Ingeniería Industrial</p>
+            <hr class="divider">
+
+            <!-- Animated SVG cover illustration -->
+            <svg class="svg-illus" viewBox="0 0 420 180" style="height:165px;">
+                <text x="210" y="18" text-anchor="middle" font-family="Lato,sans-serif" font-weight="700" font-size="13" fill="#555">Modos Normales en Cuerda Fija (L = 1 m)</text>
+                <!-- n=1 -->
+                <circle cx="40" cy="60" r="4" fill="#1a1a2e"/>
+                <circle cx="380" cy="60" r="4" fill="#1a1a2e"/>
+                <path d="M40 60 Q210 22 380 60" fill="none" stroke="#c0392b" stroke-width="2.5">
+                    <animate attributeName="d" values="M40 60 Q210 22 380 60;M40 60 Q210 98 380 60;M40 60 Q210 22 380 60" dur="2.5s" repeatCount="indefinite"/>
+                </path>
+                <path d="M40 60 Q210 98 380 60" fill="none" stroke="#c0392b" stroke-width="2.5" stroke-dasharray="4,4" opacity="0.4"/>
+                <text x="390" y="64" font-size="11" font-family="Lato,sans-serif" fill="#c0392b" font-weight="700">n=1</text>
+
+                <!-- n=2 -->
+                <circle cx="40" cy="120" r="4" fill="#1a1a2e"/>
+                <circle cx="210" cy="120" r="4" fill="#1a1a2e"/>
+                <circle cx="380" cy="120" r="4" fill="#1a1a2e"/>
+                <path d="M40 120 Q125 88 210 120 T380 120" fill="none" stroke="#2980b9" stroke-width="2.5">
+                    <animate attributeName="d" values="M40 120 Q125 88 210 120 T380 120;M40 120 Q125 152 210 120 T380 120;M40 120 Q125 88 210 120 T380 120" dur="1.8s" repeatCount="indefinite"/>
+                </path>
+                <text x="390" y="124" font-size="11" font-family="Lato,sans-serif" fill="#2980b9" font-weight="700">n=2</text>
+
+                <!-- n=3 -->
+                <circle cx="40" cy="164" r="4" fill="#1a1a2e"/>
+                <circle cx="380" cy="164" r="4" fill="#1a1a2e"/>
+                <path d="M40 164 Q93 143 147 164 T253 164 T380 164" fill="none" stroke="#27ae60" stroke-width="2.5">
+                    <animate attributeName="d" values="M40 164 Q93 143 147 164 T253 164 T380 164;M40 164 Q93 185 147 164 T253 164 T380 164;M40 164 Q93 143 147 164 T253 164 T380 164" dur="1.4s" repeatCount="indefinite"/>
+                </path>
+                <text x="390" y="168" font-size="11" font-family="Lato,sans-serif" fill="#27ae60" font-weight="700">n=3</text>
+            </svg>
+
+            <div class="note-box">
+                <strong>📌 Objetivo del Cuaderno:</strong> Comprender la formación y física de ondas estacionarias, sus condiciones de resonancia y sus aplicaciones prácticas en ingeniería y acústica musical.
+            </div>
+            <div class="page-number">iv</div>
+            <div class="page-footer">© 2026 Ramírez Espinosa · Mora Cardona</div>
+        </div>
+
+        <!-- =========================================================
+             SPREAD 2 — Principios + Nodos
+        ========================================================= -->
+        <div class="page page-left paper-lined" id="p2L">
+            <h2>1. Principios de Formación</h2>
+            <p>Una <strong>onda estacionaria</strong> se origina por el fenómeno de <span class="highlight">interferencia</span> entre dos ondas viajeras de idéntica amplitud y frecuencia que se propagan en sentidos opuestos. Matemáticamente, es un efecto aditivo que resulta del <em>Principio de Superposición</em>.</p>
+
+            <svg class="svg-illus" viewBox="0 0 420 120" style="background:#111; border-radius:8px; height:110px;">
+                <line x1="40" y1="60" x2="380" y2="60" stroke="rgba(255,255,255,0.2)" stroke-dasharray="4,4"/>
+                <!-- Wave 1 (red, going right) -->
+                <path d="M40 60 Q130 20 220 60 T400 60" fill="none" stroke="#e74c3c" stroke-width="3" opacity="0.8">
+                    <animate attributeName="d" values="M40 60 Q130 20 220 60 T400 60;M40 60 Q130 100 220 60 T400 60;M40 60 Q130 20 220 60 T400 60" dur="2s" repeatCount="indefinite"/>
+                </path>
+                <!-- Wave 2 (blue, going left) -->
+                <path d="M40 60 Q130 100 220 60 T400 60" fill="none" stroke="#3498db" stroke-width="3" opacity="0.8">
+                    <animate attributeName="d" values="M40 60 Q130 100 220 60 T400 60;M40 60 Q130 20 220 60 T400 60;M40 60 Q130 100 220 60 T400 60" dur="2s" repeatCount="indefinite"/>
+                </path>
+                <!-- Resultant (yellow) -->
+                <path d="M40 60 L400 60" fill="none" stroke="#f1c40f" stroke-width="2" opacity="0.9">
+                    <animate attributeName="d" values="M40 60 L400 60;M40 60 Q220 120 400 60;M40 60 Q220 0 400 60;M40 60 Q220 120 400 60;M40 60 L400 60" dur="2s" repeatCount="indefinite"/>
+                </path>
+                <circle cx="40" cy="60" r="5" fill="white" opacity="0.8"/>
+                <circle cx="220" cy="60" r="5" fill="white" opacity="0.8"/>
+                <circle cx="400" cy="60" r="5" fill="white" opacity="0.8"/>
+                <text x="10" y="18" font-size="10" fill="#e74c3c" font-family="Lato,sans-serif">→ Incidente</text>
+                <text x="10" y="30" font-size="10" fill="#3498db" font-family="Lato,sans-serif">← Reflejada</text>
+                <text x="10" y="42" font-size="10" fill="#f1c40f" font-family="Lato,sans-serif">= Estacionaria</text>
+            </svg>
+
+            <h3>1.1 Nodos y Antinodos</h3>
+            <p>La interferencia confina la energía creando zonas espaciales estáticas bien definidas:</p>
+            <ul>
+                <li><span class="highlight-red"><strong>Nodos (N):</strong></span> Puntos de amplitud cero permanente por interferencia destructiva de fases opuestas. El desplazamiento es nulo en todo momento.</li>
+                <li><span class="highlight-blue"><strong>Antinodos (A):</strong></span> Puntos (vientres) de amplitud máxima \(2A\), generados por interferencia constructiva pura. Concentran la mayor energía cinética del sistema.</li>
+            </ul>
+
+            <div class="note-box">
+                <strong>💡 Propiedad clave:</strong> Entre dos nodos consecutivos siempre existe exactamente un antinodo. La distancia entre nodos consecutivos es \(\lambda/2\).
+            </div>
+
+            <h3>1.2 Condiciones de Frontera</h3>
+            <p><span class="highlight">Extremos fijos (nodos forzados):</span> La onda incidente choca y su reflexión invierte fase transversal (\(\pi\) rad). Ej: cuerda de guitarra, viga empotrada.</p>
+            <p><span class="highlight-blue">Extremos libres (antinodos forzados):</span> La reflexión conserva la fase. Ej: extremo libre de barra, tubos abiertos en instrumentos de viento.</p>
+
+            <div class="page-number">1</div>
+            <div class="page-footer">© 2026 Ramírez Espinosa · Mora Cardona</div>
+        </div>
+
+        <div class="page page-right paper-lined" id="p2R">
+            <h2>1.3 Condición de Cuantización</h2>
+            <p>Para que existan nodos en ambos extremos de una cuerda de longitud \(L\), la longitud de onda debe satisfacer:</p>
+            <div class="formula-box">\[ L = n \frac{\lambda_n}{2}, \quad n = 1,\, 2,\, 3, \ldots \]</div>
+            <p>Esto implica que solo ciertas frecuencias (llamadas <strong>frecuencias de resonancia</strong>) son permitidas. El sistema actúa como un filtro cuántico de frecuencias.</p>
+
+            <table>
+                <thead>
+                    <tr><th>Modo (n)</th><th>Nodos</th><th>Antinodos</th><th>\(\lambda_n\)</th><th>\(f_n / f_1\)</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>1 (fundamental)</td><td>2</td><td>1</td><td>\(2L\)</td><td>1</td></tr>
+                    <tr><td>2 (1er armónico)</td><td>3</td><td>2</td><td>\(L\)</td><td>2</td></tr>
+                    <tr><td>3 (2do armónico)</td><td>4</td><td>3</td><td>\(\frac{2L}{3}\)</td><td>3</td></tr>
+                    <tr><td>4 (3er armónico)</td><td>5</td><td>4</td><td>\(\frac{L}{2}\)</td><td>4</td></tr>
+                    <tr><td>\(n\) (general)</td><td>\(n+1\)</td><td>\(n\)</td><td>\(\frac{2L}{n}\)</td><td>\(n\)</td></tr>
+                </tbody>
+            </table>
+
+            <div class="warn-box">
+                <strong>⚠️ Resonancia estructural:</strong> En ingeniería, la excitación a frecuencias \(f_n\) puede generar amplitudes destructivas. El colapso del Puente de Tacoma (1940) es un ejemplo histórico de resonancia mecánica.
+            </div>
+
+            <h3>1.4 Energía del Sistema</h3>
+            <p>La energía total de una onda estacionaria oscila entre cinética y potencial, pero su valor promedio se mantiene constante en el tiempo: \(E_{total} = \frac{1}{4}\mu\omega^2 A^2 L\).</p>
+
+            <div class="page-number">2</div>
+            <div class="page-footer">© 2026 Ramírez Espinosa · Mora Cardona</div>
+        </div>
+
+        <!-- =========================================================
+             SPREAD 3 — Ecuaciones + Diagramas
+        ========================================================= -->
+        <div class="page page-left paper-lined" id="p3L">
+            <h2>2. Ecuaciones Fundamentales</h2>
+            <p>Para una cuerda en \(x \in [0, L]\) con extremos fijos, la superposición de la onda incidente \(y_1 = A\sin(kx-\omega t)\) y la reflejada \(y_2 = A\sin(kx+\omega t)\) produce:</p>
+            <div class="formula-box">\[ y(x,t) = \underbrace{2A\sin(kx)}_{\text{Envolvente espacial}} \cdot \underbrace{\cos(\omega t)}_{\text{Oscilación temporal}} \]</div>
+            <p>Interpretación: cada punto \(x\) vibra sinusoidalmente en el tiempo con amplitud local \(|2A\sin(kx)|\). Los nodos aparecen donde \(\sin(kx)=0\), los antinodos donde \(|\sin(kx)|=1\).</p>
+
+            <h3>2.1 Velocidad de Fase</h3>
+            <p>Para una cuerda de densidad lineal \(\mu\) [kg/m] bajo tensión \(T\) [N]:</p>
+            <div class="formula-box">\[ v = \sqrt{\frac{T}{\mu}} \quad \text{[m/s]} \]</div>
+            <p>Esta velocidad determina con qué rapidez viaja la perturbación por el medio. Al combinarse con la condición de frontera, se obtienen las frecuencias propias:</p>
+            <div class="formula-box">\[ f_n = n \cdot \frac{v}{2L} = n \cdot \frac{1}{2L}\sqrt{\frac{T}{\mu}} \]</div>
+
+            <h3>2.2 Número de Onda y Frecuencia Angular</h3>
+            <div class="formula-box">\[ k_n = \frac{n\pi}{L}, \qquad \omega_n = 2\pi f_n = \frac{n\pi v}{L} \]</div>
+
+            <div class="note-box">
+                <strong>🎵 Nota musical:</strong> La frecuencia fundamental \(f_1\) determina el tono percibido. Los armónicos \(f_2, f_3, \ldots\) determinan el timbre del instrumento.
+            </div>
+
+            <div class="page-number">3</div>
+            <div class="page-footer">© 2026 Ramírez Espinosa · Mora Cardona</div>
+        </div>
+
+        <div class="page page-right paper-graph" id="p3R">
+            <h2>Diagramas Estáticos de Modos</h2>
+            <p>La condición \(f_n = n\,f_1\) dibuja perfiles modales claros. Al contar vientres y nodos se identifica de inmediato el grado modal \(n\).</p>
+
+            <svg class="svg-illus" viewBox="0 0 500 240" style="height:220px;">
+                <text x="250" y="18" text-anchor="middle" font-family="Lato,sans-serif" font-weight="700" font-size="13" fill="#333">Topología de Nodos (N) y Antinodos (A)</text>
+                <!-- Axes -->
+                <line x1="50" y1="28" x2="50" y2="230" stroke="#ccc" stroke-dasharray="2,2"/>
+                <line x1="450" y1="28" x2="450" y2="230" stroke="#ccc" stroke-dasharray="2,2"/>
+
+                <!-- n=1 -->
+                <path d="M50 68 Q250 32 450 68" fill="rgba(192,57,43,0.1)" stroke="#c0392b" stroke-width="2"/>
+                <path d="M50 68 Q250 104 450 68" fill="none" stroke="#c0392b" stroke-width="2" stroke-dasharray="4,4"/>
+                <circle cx="50" cy="68" r="4" fill="#c0392b"/><circle cx="450" cy="68" r="4" fill="#c0392b"/>
+                <text x="55" y="84" font-size="10" font-weight="700" fill="#555">N</text><text x="453" y="84" font-size="10" font-weight="700" fill="#555">N</text>
+                <text x="247" y="52" font-size="11" font-weight="700" fill="#c0392b" text-anchor="middle">A</text>
+                <text x="470" y="68" font-size="11" fill="#c0392b" font-weight="700">n=1</text>
+
+                <!-- n=2 -->
+                <path d="M50 138 Q150 102 250 138 T450 138" fill="rgba(41,128,185,0.1)" stroke="#2980b9" stroke-width="2"/>
+                <path d="M50 138 Q150 174 250 138 T450 138" fill="none" stroke="#2980b9" stroke-width="2" stroke-dasharray="4,4"/>
+                <circle cx="50" cy="138" r="4" fill="#2980b9"/><circle cx="250" cy="138" r="4" fill="#2980b9"/><circle cx="450" cy="138" r="4" fill="#2980b9"/>
+                <text x="150" y="124" font-size="11" font-weight="700" fill="#2980b9" text-anchor="middle">A</text>
+                <text x="350" y="124" font-size="11" font-weight="700" fill="#2980b9" text-anchor="middle">A</text>
+                <text x="470" y="138" font-size="11" fill="#2980b9" font-weight="700">n=2</text>
+
+                <!-- n=3 -->
+                <path d="M50 202 Q117 172 183 202 T317 202 T450 202" fill="rgba(39,174,96,0.1)" stroke="#27ae60" stroke-width="2"/>
+                <path d="M50 202 Q117 232 183 202 T317 202 T450 202" fill="none" stroke="#27ae60" stroke-width="2" stroke-dasharray="4,4"/>
+                <circle cx="50" cy="202" r="4" fill="#27ae60"/><circle cx="183" cy="202" r="4" fill="#27ae60"/><circle cx="317" cy="202" r="4" fill="#27ae60"/><circle cx="450" cy="202" r="4" fill="#27ae60"/>
+                <text x="117" y="190" font-size="11" font-weight="700" fill="#27ae60" text-anchor="middle">A</text>
+                <text x="250" y="190" font-size="11" font-weight="700" fill="#27ae60" text-anchor="middle">A</text>
+                <text x="383" y="190" font-size="11" font-weight="700" fill="#27ae60" text-anchor="middle">A</text>
+                <text x="470" y="202" font-size="11" fill="#27ae60" font-weight="700">n=3</text>
+            </svg>
+
+            <h3>Ejemplo Industrial: Viga en Voladizo</h3>
+            <svg class="svg-illus" viewBox="0 0 400 100" style="background:#ecf0f1; border-radius:8px; height:90px;">
+                <rect x="10" y="25" width="24" height="50" fill="#34495e"/>
+                <path d="M34 50 Q200 50 370 65" fill="none" stroke="#2c3e50" stroke-width="6" stroke-linecap="round">
+                    <animate attributeName="d" values="M34 50 Q200 50 370 65;M34 50 Q200 50 370 35;M34 50 Q200 50 370 65" dur="1.2s" repeatCount="indefinite"/>
+                </path>
+                <text x="200" y="95" text-anchor="middle" font-size="11" font-family="Lato,sans-serif" fill="#555">Modo fundamental de flexión — viga empotrada-libre</text>
+                <text x="34" y="20" font-size="10" fill="#e74c3c" font-family="Lato,sans-serif">Nodo</text>
+                <text x="350" y="20" font-size="10" fill="#27ae60" font-family="Lato,sans-serif">Antinodo</text>
+            </svg>
+
+            <div class="page-number">4</div>
+            <div class="page-footer">© 2026 Ramírez Espinosa · Mora Cardona</div>
+        </div>
+
+        <!-- =========================================================
+             SPREAD 4 — Panel de Control + Simulación
+        ========================================================= -->
+        <div class="page page-left paper-lined" id="p4L">
+            <h2>3. Panel de Control — Simulación</h2>
+            <p>Ajuste los parámetros para inducir <strong>resonancia</strong> en la cuerda virtual. Use los botones de Armónicos para establecer frecuencias exactas de resonancia.</p>
+
+            <div class="dashboard">
+                <div class="telemetry">
+                    <div class="stat-box"><div class="stat-val" id="val-mode">1</div><div class="stat-lbl">Modo n</div></div>
+                    <div class="stat-box"><div class="stat-val" id="val-freq">1.00</div><div class="stat-lbl">f/f₁</div></div>
+                    <div class="stat-box"><div class="stat-val" id="val-wave">2.00</div><div class="stat-lbl">λ (m)</div></div>
+                    <div class="stat-box"><div class="stat-val" id="val-hz">–</div><div class="stat-lbl">Frec. (Hz)</div></div>
+                </div>
+
+                <div class="control-group">
+                    <label>Armónicos Perfectos:</label>
+                    <div class="harmonic-btn-group">
+                        <button class="harmonic-btn selected" onclick="setHarmonicUI(1)">n=1</button>
+                        <button class="harmonic-btn" onclick="setHarmonicUI(2)">n=2</button>
+                        <button class="harmonic-btn" onclick="setHarmonicUI(3)">n=3</button>
+                        <button class="harmonic-btn" onclick="setHarmonicUI(4)">n=4</button>
+                        <button class="harmonic-btn" onclick="setHarmonicUI(5)">n=5</button>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label>Frecuencia manual (f) <span id="lbl-f">2.00 Hz</span></label>
+                    <input type="range" id="slider-f" min="0.5" max="15.0" step="0.05" value="2" oninput="onSliderF(this.value)">
+                </div>
+                <div class="control-group">
+                    <label>Tensión del sistema (T) <span id="lbl-t">100 N</span></label>
+                    <input type="range" id="slider-t" min="10" max="250" step="5" value="100" oninput="onSliderT(this.value)">
+                </div>
+                <div class="control-group">
+                    <label>Amortiguamiento <span id="lbl-d">Medio</span></label>
+                    <input type="range" id="slider-d" min="0.01" max="0.3" step="0.01" value="0.05" oninput="onSliderD(this.value)">
+                </div>
+                <div style="display:flex;align-items:center;gap:10px;padding-top:8px;border-top:1px dashed #ccc;font-size:0.82rem;">
+                    <input type="checkbox" id="chk-components"> <label for="chk-components">Mostrar ondas componentes (incidente + reflejada)</label>
+                </div>
+            </div>
+            <div class="page-number">5</div>
+            <div class="page-footer">© 2026 Ramírez Espinosa · Mora Cardona</div>
+        </div>
+
+        <div class="page page-right paper-graph" id="p4R">
+            <h2>4. Simulación Analítica</h2>
+            <canvas id="simCanvas"></canvas>
+            <p style="margin-top:12px; font-size:0.88rem; color:var(--ink-light);">El oscilador inyecta ondas que se reflejan en el extremo derecho. Al llevar la frecuencia a un múltiplo exacto \(f_n\), el sistema entra en <strong>resonancia armónica</strong> acumulando gran densidad de energía.</p>
+            <div class="note-box" style="margin-top:8px;">
+                <strong>💡 Experimento:</strong> Pulse <em>n=3</em> y observe cómo aparecen 4 nodos y 3 antinodos perfectamente estabilizados. Luego suba el amortiguamiento y vea cómo se extingue la onda.
+            </div>
+            <div class="page-number">6</div>
+            <div class="page-footer">© 2026 Ramírez Espinosa · Mora Cardona</div>
+        </div>
+
+        <!-- =========================================================
+             SPREAD 5 — Gráficas + Espectro
+        ========================================================= -->
+        <div class="page page-left paper-graph" id="p5L">
+            <h2>5. Telemetría de Amplitudes</h2>
+            <p style="font-size:0.85rem; margin-bottom:6px; color:var(--ink-light);">Los gráficos muestran el perfil espacial y la historia temporal de la onda estacionaria en tiempo real.</p>
+            <div class="chart-container" style="height:220px;">
+                <canvas id="chartSpatial"></canvas>
+            </div>
+            <div class="chart-container" style="height:220px;">
+                <canvas id="chartTime"></canvas>
+            </div>
+            <div class="page-number">7</div>
+            <div class="page-footer">© 2026 Ramírez Espinosa · Mora Cardona</div>
+        </div>
+
+        <div class="page page-right paper-graph" id="p5R">
+            <h2>6. Análisis de Espectro Modal</h2>
+            <p style="font-size:0.88rem;">El espectro revela dónde están los modos propios del sistema. Si la frecuencia de excitación (barra roja) coincide con un modo \(f_n\), se produce resonancia potencialmente peligrosa en estructuras.</p>
+            <div class="chart-container" style="height:290px; margin-top:12px;">
+                <canvas id="chartSpectrum"></canvas>
+            </div>
+            <button onclick="resetZoom()" style="width:100%; margin-top:8px; padding:8px; background:var(--accent2); color:white; border:none; border-radius:4px; cursor:pointer; font-weight:700; font-size:0.85rem;">↺ Restaurar Vista</button>
+            <div class="note-box" style="margin-top:10px; font-size:0.8rem;">
+                <strong>Lectura del espectro:</strong> Las barras grises muestran la capacidad modal del sistema. La barra roja señala la carga de excitación actual. Solapamiento → resonancia → riesgo estructural.
+            </div>
+            <div class="page-number">8</div>
+            <div class="page-footer">© 2026 Ramírez Espinosa · Mora Cardona</div>
+        </div>
+
+        <!-- =========================================================
+             SPREAD 6 — Guitarra + Sintetizador
+        ========================================================= -->
+        <div class="page page-left paper-lined" id="p6L">
+            <h2>7. Aplicación: La Guitarra Acústica</h2>
+            <p>La acústica musical es una de las aplicaciones más espectaculares de las ondas estacionarias. Una guitarra clásica tiene <strong>6 cuerdas</strong> bajo tensiones específicas que, al ser punteadas, establecen un nodo en la <em>cejuela</em> (nut) y otro en el <em>puente</em> (bridge).</p>
+
+            <svg class="svg-illus" viewBox="0 0 400 150" style="background:#c0392b; border-radius:8px; height:130px;">
+                <path d="M280 15 C380 10,390 140,280 135 C240 130,240 100,200 100 C160 100,160 130,120 135 C10 140,20 10,120 15 C160 20,160 50,200 50 C240 50,240 20,280 15" fill="#e67e22" stroke="#8e44ad" stroke-width="4"/>
+                <circle cx="200" cy="75" r="35" fill="#222"/>
+                <circle cx="200" cy="75" r="28" fill="#1a1a1a"/>
+                <rect x="0" y="65" width="165" height="20" fill="#7f8c8d"/>
+                <rect x="250" y="55" width="15" height="40" fill="#34495e"/>
+                <line x1="5" y1="68" x2="257" y2="68" stroke="#f1c40f" stroke-width="2.5"/>
+                <line x1="5" y1="73" x2="257" y2="73" stroke="#bdc3c7" stroke-width="2"/>
+                <line x1="5" y1="78" x2="257" y2="78" stroke="#ecf0f1" stroke-width="1.5"/>
+                <line x1="5" y1="82" x2="257" y2="82" stroke="#bdc3c7" stroke-width="2"/>
+                <line x1="5" y1="86" x2="257" y2="86" stroke="#95a5a6" stroke-width="1"/>
+                <!-- Frets -->
+                <line x1="40" y1="65" x2="40" y2="85" stroke="#bdc3c7" stroke-width="1.5"/>
+                <line x1="80" y1="65" x2="80" y2="85" stroke="#bdc3c7" stroke-width="1.5"/>
+                <line x1="118" y1="65" x2="118" y2="85" stroke="#bdc3c7" stroke-width="1.5"/>
+                <text x="200" y="148" text-anchor="middle" font-size="10" fill="rgba(255,255,255,0.7)" font-family="Lato,sans-serif">Guitarra Clásica — Afinación Estándar EADGBE</text>
+            </svg>
+
+            <h3>Afinación Estándar (EADGBE)</h3>
+            <table>
+                <thead><tr><th>Cuerda</th><th>Nota</th><th>f (Hz)</th><th>μ relativo</th></tr></thead>
+                <tbody>
+                    <tr><td>1ª</td><td>Mi4 (E4)</td><td>329.6</td><td>muy bajo</td></tr>
+                    <tr><td>2ª</td><td>Si3 (B3)</td><td>246.9</td><td>bajo</td></tr>
+                    <tr><td>3ª</td><td>Sol3 (G3)</td><td>196.0</td><td>medio</td></tr>
+                    <tr><td>4ª</td><td>Re3 (D3)</td><td>146.8</td><td>medio-alto</td></tr>
+                    <tr><td>5ª</td><td>La2 (A2)</td><td>110.0</td><td>alto</td></tr>
+                    <tr><td>6ª</td><td>Mi2 (E2)</td><td>82.41</td><td>muy alto</td></tr>
+                </tbody>
+            </table>
+            <p style="font-size:0.85rem; margin-top:8px;">El <strong>timbre</strong> no lo da solo el fundamental, sino la combinación de sobretonos \(2f, 3f, \ldots\) modulada por la anatomía de la madera de la caja de resonancia.</p>
+
+            <div class="page-number">9</div>
+            <div class="page-footer">© 2026 Ramírez Espinosa · Mora Cardona</div>
+        </div>
+
+        <div class="page page-right paper-graph" id="p6R">
+            <h2>8. Sintetizador Físico Interactivo</h2>
+            <p style="color:var(--accent); font-weight:700; font-size:0.88rem;">🎸 Pasa el cursor sobre las cuerdas de la guitarra para "puntearlas". Cada cuerda toca su nota real (Web Audio API).</p>
+            <canvas id="guitarCanvas"></canvas>
+            <p style="margin-top:10px; font-size:0.85rem; color:var(--ink-light);">La visualización simula la vibración libre de cada cuerda superponiendo frecuencias armónicas. Al tocar, el oscilador de audio genera la frecuencia exacta de afinación estándar.</p>
+            <div class="note-box" style="margin-top:8px; font-size:0.8rem;">
+                <strong>🔊 Habilita el sonido:</strong> Haz click una vez en la guitarra para activar el contexto de audio del navegador, luego desliza el cursor sobre las cuerdas.
+            </div>
+            <div class="page-number">10</div>
+            <div class="page-footer">© 2026 Ramírez Espinosa · Mora Cardona</div>
+        </div>
+
+        <!-- =========================================================
+             SPREAD 7 — Aplicaciones Industriales
+        ========================================================= -->
+        <div class="page page-left paper-lined" id="p7L">
+            <h2>9. Aplicaciones en Ingeniería Industrial</h2>
+            <p>El conocimiento de las ondas estacionarias tiene aplicaciones directas y críticas en múltiples ramas de la ingeniería:</p>
+
+            <h3>🏗️ Ingeniería Estructural y Civil</h3>
+            <p>Puentes, edificios y chimeneas industriales son susceptibles a la excitación eólica a sus frecuencias naturales. El análisis modal determina los modos de vibración para diseñar sistemas de amortiguamiento.</p>
+            <div class="warn-box">
+                <strong>Caso histórico — Puente de Tacoma (1940):</strong> El viento a ~19 km/h indujo resonancia en el modo torsional (f ≈ 0.2 Hz), causando el colapso estructural. Hoy los puentes se diseñan con análisis aeroelástico.
+            </div>
+
+            <h3>⚙️ Maquinaria Rotatoria</h3>
+            <p>Ejes, engranajes y turbinas tienen frecuencias naturales de flexión y torsión. La operación a velocidades críticas genera resonancia que puede fracturar el eje en segundos. El análisis de Campbell (speed vs frequency) es esencial en el diseño.</p>
+
+            <h3>🔊 Acústica Industrial</h3>
+            <p>Los ductos de HVAC, muflers de motores y cámaras anecóicas se diseñan controlando los modos acústicos (ondas estacionarias en aire) para minimizar ruido y vibración.</p>
+
+            <div class="formula-box" style="font-size:0.95rem;">\[ f_n^{\text{tubo abierto}} = \frac{nv_{aire}}{2L}, \quad f_n^{\text{tubo cerrado}} = \frac{(2n-1)v_{aire}}{4L} \]</div>
+
+            <h3>📡 Electrónica y Telecomunicaciones</h3>
+            <p>Las líneas de transmisión de RF, guías de onda y cavidades de microondas operan con ondas estacionarias electromagnéticas. La longitud resonante determina la frecuencia de operación.</p>
+
+            <div class="page-number">11</div>
+            <div class="page-footer">© 2026 Ramírez Espinosa · Mora Cardona</div>
+        </div>
+
+        <div class="page page-right paper-lined" id="p7R">
+            <h2>10. Autoevaluación y Referencias</h2>
+
+            <h3>Preguntas de Autoevaluación</h3>
+            <div id="quiz-container">
+                <div class="quiz-q" style="background:rgba(0,0,0,0.03); border-radius:6px; padding:12px; margin-bottom:10px; font-size:0.88rem;">
+                    <p style="font-weight:700; margin-bottom:8px;">1. Una cuerda de L = 0.80 m tiene μ = 0.005 kg/m y T = 80 N. ¿Cuál es la frecuencia del 3er armónico (n=3)?</p>
+                    <div style="display:flex; flex-direction:column; gap:5px;">
+                        <label style="cursor:pointer;"><input type="radio" name="q1" value="a"> a) 187.5 Hz</label>
+                        <label style="cursor:pointer;"><input type="radio" name="q1" value="b"> b) 375 Hz ✓</label>
+                        <label style="cursor:pointer;"><input type="radio" name="q1" value="c"> c) 125 Hz</label>
+                        <label style="cursor:pointer;"><input type="radio" name="q1" value="d"> d) 562.5 Hz</label>
+                    </div>
+                    <div id="q1-result" style="margin-top:6px; font-size:0.8rem;"></div>
+                </div>
+                <div class="quiz-q" style="background:rgba(0,0,0,0.03); border-radius:6px; padding:12px; margin-bottom:10px; font-size:0.88rem;">
+                    <p style="font-weight:700; margin-bottom:8px;">2. ¿Cuántos nodos internos tiene el modo n=4 de una cuerda con extremos fijos?</p>
+                    <div style="display:flex; flex-direction:column; gap:5px;">
+                        <label style="cursor:pointer;"><input type="radio" name="q2" value="a"> a) 3 ✓</label>
+                        <label style="cursor:pointer;"><input type="radio" name="q2" value="b"> b) 4</label>
+                        <label style="cursor:pointer;"><input type="radio" name="q2" value="c"> c) 5</label>
+                        <label style="cursor:pointer;"><input type="radio" name="q2" value="d"> d) 2</label>
+                    </div>
+                    <div id="q2-result" style="margin-top:6px; font-size:0.8rem;"></div>
+                </div>
+                <button onclick="checkQuiz()" style="background:var(--accent2); color:white; border:none; border-radius:4px; padding:8px 20px; cursor:pointer; font-weight:700; font-size:0.85rem;">✅ Verificar Respuestas</button>
+            </div>
+
+            <h3 style="margin-top:16px;">Referencias Bibliográficas</h3>
+            <ol style="font-size:0.82rem; line-height:1.8;">
+                <li>Serway, R. A., & Jewett, J. W. (2018). <em>Física para Ciencias e Ingeniería</em> (10ª ed.). Cengage Learning.</li>
+                <li>Halliday, D., Resnick, R., & Walker, J. (2021). <em>Fundamentals of Physics</em> (11ª ed.). Wiley.</li>
+                <li>French, A. P. (1971). <em>Vibrations and Waves</em>. MIT Press.</li>
+                <li>Kinsler, L. E., et al. (1999). <em>Fundamentals of Acoustics</em> (4ª ed.). Wiley.</li>
+                <li>Rao, S. S. (2017). <em>Mechanical Vibrations</em> (6ª ed.). Pearson.</li>
+            </ol>
+
+            <div style="margin-top:16px; padding:12px; border:1px solid rgba(212,160,23,0.4); border-radius:4px; font-size:0.76rem; text-align:center; color:var(--ink-light);">
+                © 2026 Oscar Alejandro Ramírez Espinosa y Jeny Maritza Mora Cardona.<br>
+                Todos los derechos reservados. Prohibida la reproducción sin autorización expresa.
+            </div>
+            <div class="page-number">12</div>
+            <div class="page-footer">© 2026 Ramírez Espinosa · Mora Cardona</div>
+        </div>
+
+    </div><!-- end page-container -->
+
+    <button class="nav-btn" id="btn-prev" onclick="goToSpread(-1)" disabled>◄ Anterior</button>
+    <button class="nav-btn" id="btn-index" onclick="goToIndex()">📋 Índice</button>
+    <button class="nav-btn" id="btn-next" onclick="goToSpread(1)">Siguiente ►</button>
+
+</div><!-- end notebook -->
+</div><!-- end notebook-wrapper -->
+</div><!-- end main -->
+
+<!-- ===============================================================
+     SEARCH OVERLAY
+================================================================ -->
+<div id="searchOverlay">
+    <div class="search-box">
+        <h3 style="margin-bottom:10px; font-family:var(--font-display);">🔍 Buscar en el Cuaderno</h3>
+        <input type="text" id="searchInput" placeholder="Escribe un término..." oninput="doSearch(this.value)" onkeydown="if(event.key==='Escape') toggleSearch()">
+        <div id="searchResults"></div>
+        <button onclick="toggleSearch()" style="margin-top:10px; background:#eee; border:none; padding:6px 16px; border-radius:4px; cursor:pointer; font-size:0.85rem;">Cerrar</button>
+    </div>
+</div>
+
+<!-- ===============================================================
+     NOTES PANEL
+================================================================ -->
+<div id="notesPanel">
+    <h4>📝 Notas Personales</h4>
+    <p style="font-size:0.78rem; color:#888; margin-bottom:8px;">Tus notas se guardan automáticamente en el navegador.</p>
+    <textarea id="notesArea" placeholder="Escribe tus notas aquí..." oninput="saveNotes()"></textarea>
+    <button onclick="toggleNotes()" style="margin-top:8px; background:#eee; border:none; padding:6px 10px; border-radius:4px; cursor:pointer; font-size:0.82rem; width:100%;">✖ Cerrar Notas</button>
+</div>
+
+<!-- ===============================================================
+     READING TIMER
+================================================================ -->
+<div id="timerWidget">
+    ⏱ <span id="timerDisplay">00:00</span>
+    <button onclick="resetTimer()" style="margin-left:8px; background:none; border:1px solid var(--gold); color:var(--gold); padding:2px 8px; border-radius:3px; cursor:pointer; font-size:0.75rem;">Reset</button>
+</div>
+
+<!-- ===============================================================
+     CHATBOT
+================================================================ -->
+<div id="chatbot">
+    <div class="chat-panel" id="chatPanel">
+        <div class="chat-header">
+            <span>🎓 Tutor IA — Física Ondulatoria</span>
+            <span style="cursor:pointer" onclick="toggleChat()">✖</span>
+        </div>
+        <div class="chat-body" id="chatBody">
+            <div class="msg msg-ai">¡Hola! Soy tu tutor de física ondulatoria. Puedo ayudarte con preguntas sobre ondas estacionarias, resonancia, modos normales y aplicaciones en ingeniería. ¿Qué quieres aprender hoy?</div>
+        </div>
+        <div class="chat-input-row">
+            <input type="text" id="chatInput" placeholder="Haz tu pregunta..." onkeypress="if(event.key==='Enter') sendChat()">
+            <button onclick="sendChat()">➤</button>
+        </div>
+    </div>
+    <div class="chat-fab" onclick="toggleChat()">💬</div>
+</div>
+
+<!-- ===============================================================
+     MAIN JAVASCRIPT
+================================================================ -->
+<script>
+/* ============================================================
+   STATE
+============================================================ */
+const TOTAL_SPREADS = 8; // 0..7
+let currentSpread = 0;
+let isAnimating = false;
+let darkMode = false;
+let timerRunning = false, timerSeconds = 0, timerInterval = null;
+let audioCtx = null;
+
+// Pages per spread: [leftId, rightId]
+const spreads = [
+    ['p0L','p0R'], // 0: cover
+    ['p1L','p1R'], // 1: index + intro
+    ['p2L','p2R'], // 2: formation + nodos
+    ['p3L','p3R'], // 3: equations + diagrams
+    ['p4L','p4R'], // 4: panel + sim
+    ['p5L','p5R'], // 5: charts + spectrum
+    ['p6L','p6R'], // 6: guitar + synth
+    ['p7L','p7R'], // 7: industrial + quiz
+];
+
+/* ============================================================
+   NAVIGATION
+============================================================ */
+function openNotebook() {
+    document.getElementById('splash').classList.add('hidden');
+    document.getElementById('main').style.display = 'flex';
+    setTimeout(initSimulations, 300);
+}
+
+function goToSpread(dir) {
+    if (isAnimating) return;
+    const next = currentSpread + dir;
+    if (next < 0 || next >= TOTAL_SPREADS) return;
+    isAnimating = true;
+
+    const [curL, curR] = spreads[currentSpread].map(id => document.getElementById(id));
+    const [nxtL, nxtR] = spreads[next].map(id => document.getElementById(id));
+
+    if (dir > 0) {
+        curR.classList.add('anim-next-out');
+        nxtL.classList.add('anim-next-in');
+    } else {
+        curL.classList.add('anim-prev-out');
+        nxtR.classList.add('anim-prev-in');
+    }
+
+    setTimeout(() => {
+        curL.classList.remove('active','anim-next-out','anim-prev-out');
+        curR.classList.remove('active','anim-next-out','anim-prev-out');
+        nxtL.classList.remove('anim-next-in','anim-prev-in');
+        nxtR.classList.remove('anim-next-in','anim-prev-in');
+        nxtL.classList.add('active');
+        nxtR.classList.add('active');
+        currentSpread = next;
+        isAnimating = false;
+        updateNav();
+    }, 800);
+}
+
+function goToPage(spreadIndex) {
+    if (isAnimating || spreadIndex === currentSpread) return;
+    const dir = spreadIndex > currentSpread ? 1 : -1;
+    function step() {
+        if (currentSpread === spreadIndex) return;
+        goToSpread(dir);
+        setTimeout(step, 820);
+    }
+    step();
+}
+
+function goToIndex() { goToPage(1); }
+
+function updateNav() {
+    document.getElementById('btn-prev').disabled = currentSpread === 0;
+    document.getElementById('btn-next').disabled = currentSpread === TOTAL_SPREADS - 1;
+    document.getElementById('tb-prev').disabled = currentSpread === 0;
+    document.getElementById('tb-next').disabled = currentSpread === TOTAL_SPREADS - 1;
+    const pageNum = currentSpread === 0 ? 'Portada' : `Pág ${currentSpread * 2 - 1}–${currentSpread * 2} de ${(TOTAL_SPREADS-1)*2}`;
+    document.getElementById('pgIndicator').textContent = pageNum;
+    document.getElementById('progress-bar').style.width = ((currentSpread / (TOTAL_SPREADS-1)) * 100) + '%';
+}
+
+/* ============================================================
+   TOOLBAR ACTIONS
+============================================================ */
+function toggleDark() {
+    darkMode = !darkMode;
+    document.body.classList.toggle('dark-mode', darkMode);
+    document.getElementById('btn-dark').textContent = darkMode ? '☀️ Modo Claro' : '🌙 Modo Oscuro';
+    document.getElementById('btn-dark').classList.toggle('active', darkMode);
+}
+
+function toggleSearch() {
+    const el = document.getElementById('searchOverlay');
+    el.classList.toggle('open');
+    if (el.classList.contains('open')) document.getElementById('searchInput').focus();
+}
+
+function toggleNotes() {
+    document.getElementById('notesPanel').classList.toggle('open');
+}
+
+function saveNotes() {
+    try { localStorage.setItem('cuaderno-notes', document.getElementById('notesArea').value); } catch(e) {}
+}
+
+function loadNotes() {
+    try { const n = localStorage.getItem('cuaderno-notes'); if (n) document.getElementById('notesArea').value = n; } catch(e) {}
+}
+
+function toggleTimer() {
+    const w = document.getElementById('timerWidget');
+    w.classList.toggle('visible');
+    if (w.classList.contains('visible') && !timerRunning) startTimer();
+    else stopTimer();
+}
+
+function startTimer() {
+    timerRunning = true;
+    timerInterval = setInterval(() => {
+        timerSeconds++;
+        const m = String(Math.floor(timerSeconds/60)).padStart(2,'0');
+        const s = String(timerSeconds%60).padStart(2,'0');
+        document.getElementById('timerDisplay').textContent = m+':'+s;
+    }, 1000);
+}
+function stopTimer() { timerRunning = false; clearInterval(timerInterval); }
+function resetTimer() { stopTimer(); timerSeconds = 0; document.getElementById('timerDisplay').textContent = '00:00'; startTimer(); }
+
+function printNotebook() { window.print(); }
+
+function takeScreenshot() {
+    html2canvas(document.getElementById('notebook-canvas'), {scale:1.5}).then(canvas => {
+        const a = document.createElement('a'); a.href = canvas.toDataURL('image/png');
+        a.download = 'cuaderno-ondas.png'; a.click();
+    });
+}
+
+/* ============================================================
+   SEARCH
+============================================================ */
+const searchIndex = [
+    { title: 'Principios de formación de ondas estacionarias', page: 2, spread: 2 },
+    { title: 'Interferencia y superposición de ondas', page: 2, spread: 2 },
+    { title: 'Nodos y antinodos', page: 2, spread: 2 },
+    { title: 'Condiciones de frontera — extremos fijos y libres', page: 2, spread: 2 },
+    { title: 'Condición de cuantización de frecuencias', page: 2, spread: 2 },
+    { title: 'Tabla de modos normales', page: 2, spread: 2 },
+    { title: 'Resonancia estructural — Puente de Tacoma', page: 2, spread: 2 },
+    { title: 'Ecuaciones fundamentales — y(x,t)', page: 3, spread: 3 },
+    { title: 'Velocidad de fase — tensión y densidad lineal', page: 3, spread: 3 },
+    { title: 'Frecuencias de resonancia fn', page: 3, spread: 3 },
+    { title: 'Número de onda kn y frecuencia angular ωn', page: 3, spread: 3 },
+    { title: 'Diagramas de modos normales — nodos y antinodos', page: 4, spread: 3 },
+    { title: 'Viga en voladizo — modo fundamental', page: 4, spread: 3 },
+    { title: 'Panel de control — simulación interactiva', page: 5, spread: 4 },
+    { title: 'Armónicos — botones n=1 a n=5', page: 5, spread: 4 },
+    { title: 'Simulación analítica de onda estacionaria', page: 6, spread: 4 },
+    { title: 'Telemetría de amplitudes — gráfica espacial', page: 7, spread: 5 },
+    { title: 'Historia temporal de aceleración', page: 7, spread: 5 },
+    { title: 'Espectro modal — análisis de frecuencias', page: 8, spread: 5 },
+    { title: 'Guitarra acústica — afinación estándar EADGBE', page: 9, spread: 6 },
+    { title: 'Frecuencias de las cuerdas de guitarra', page: 9, spread: 6 },
+    { title: 'Sintetizador físico interactivo — Web Audio', page: 10, spread: 6 },
+    { title: 'Aplicaciones industriales — estructuras', page: 11, spread: 7 },
+    { title: 'Maquinaria rotatoria — velocidades críticas', page: 11, spread: 7 },
+    { title: 'Acústica industrial — ductos HVAC', page: 11, spread: 7 },
+    { title: 'Autoevaluación — preguntas y respuestas', page: 12, spread: 7 },
+    { title: 'Referencias bibliográficas', page: 12, spread: 7 },
+];
+
+function doSearch(q) {
+    const res = document.getElementById('searchResults');
+    if (!q.trim()) { res.innerHTML = ''; return; }
+    const hits = searchIndex.filter(e => e.title.toLowerCase().includes(q.toLowerCase()));
+    if (!hits.length) { res.innerHTML = '<p style="color:#888; font-size:0.85rem; padding:8px;">Sin resultados.</p>'; return; }
+    res.innerHTML = hits.slice(0,8).map(h => `
+        <div class="search-result" onclick="goToPage(${h.spread}); toggleSearch();">
+            ${h.title}
+            <div class="sr-pg">Página ${h.page}</div>
+        </div>
+    `).join('');
+}
+
+/* ============================================================
+   QUIZ
+============================================================ */
+function checkQuiz() {
+    const answers = { q1: 'b', q2: 'a' };
+    for (const [q, correct] of Object.entries(answers)) {
+        const selected = document.querySelector(`input[name="${q}"]:checked`);
+        const resultEl = document.getElementById(`${q}-result`);
+        if (!selected) { resultEl.textContent = '⚠️ Selecciona una respuesta.'; resultEl.style.color='#e67e22'; continue; }
+        if (selected.value === correct) {
+            resultEl.textContent = '✅ ¡Correcto!'; resultEl.style.color='#27ae60';
+        } else {
+            resultEl.textContent = `❌ Incorrecto. La respuesta correcta es (${correct.toUpperCase()}).`; resultEl.style.color='#c0392b';
+        }
+    }
+}
+
+/* ============================================================
+   CHATBOT
+============================================================ */
+function toggleChat() { document.getElementById('chatPanel').classList.toggle('open'); }
+
+const chatResponses = [
+    "Una onda estacionaria surge cuando dos ondas idénticas se propagan en sentidos opuestos y se superponen. Los nodos son puntos de amplitud cero; los antinodos, de amplitud máxima (2A).",
+    "La frecuencia fundamental es f₁ = v/(2L), donde v = √(T/μ). Los armónicos son múltiplos enteros: f_n = n·f₁. Cualquier frecuencia que no sea múltiplo de f₁ no produce resonancia.",
+    "En la guitarra, cada cuerda tiene densidad lineal y tensión específicas para producir su nota. La cuerda Mi grave (E2) tiene 82.4 Hz, mientras que el Mi agudo (E4) tiene 329.6 Hz, exactamente 4 octavas arriba.",
+    "La resonancia en estructuras ocurre cuando la frecuencia de excitación externa coincide con una frecuencia natural del sistema. El resultado puede ser amplitudes destructivas, como ocurrió en el Puente de Tacoma en 1940.",
+    "La energía en una onda estacionaria no se propaga; oscila entre las formas cinética y potencial. La densidad de energía es máxima en los antinodos y nula en los nodos.",
+    "Para un tubo abierto en ambos extremos: f_n = nv/(2L). Para un tubo cerrado en un extremo: solo los modos impares son posibles, f_n = (2n-1)v/(4L). Por eso los instrumentos de viento producen timbres distintos.",
+];
+let chatIdx = 0;
+
+function sendChat() {
+    const input = document.getElementById('chatInput');
+    const body = document.getElementById('chatBody');
+    if (!input.value.trim()) return;
+    const um = document.createElement('div'); um.className='msg msg-user'; um.textContent=input.value; body.appendChild(um);
+    input.value = '';
+    setTimeout(() => {
+        const bm = document.createElement('div'); bm.className='msg msg-ai';
+        bm.textContent = chatResponses[chatIdx % chatResponses.length]; chatIdx++;
+        body.appendChild(bm); body.scrollTop = body.scrollHeight;
+    }, 700);
+    body.scrollTop = body.scrollHeight;
+}
+
+/* ============================================================
+   SPINE RINGS
+============================================================ */
+function buildSpine() {
+    const spine = document.getElementById('spine-rings');
+    for (let i = 0; i < 14; i++) {
+        const ring = document.createElement('div');
+        ring.className = 'ring';
+        spine.insertBefore(ring, spine.querySelector('.spine-title'));
+    }
+}
+
+/* ============================================================
+   SIMULATION ENGINE
+============================================================ */
+let simPhysics = { driveFreq: 2.0, Tension: 100, damping: 0.05, mu: 0.01, L: 1.0 };
+let simData = { t: 0, nodes: [] };
+const N_NODES = 121;
+const TIME_SAMPLES = 200;
+let simDataSpatial = new Array(N_NODES).fill(0);
+let simDataTime = [];
+let chartSpatial, chartTime, chartSpectrum;
+let animRunning = false;
+let lastTime = 0;
+
+function f1() { return Math.sqrt(simPhysics.Tension / simPhysics.mu) / (2 * simPhysics.L); }
+
+function onSliderF(v) { simPhysics.driveFreq = parseFloat(v); document.getElementById('lbl-f').textContent = parseFloat(v).toFixed(2)+' Hz'; updateTelemetry(); updateSpectrum(); }
+function onSliderT(v) { simPhysics.Tension = parseFloat(v); document.getElementById('lbl-t').textContent = v+' N'; updateTelemetry(); updateSpectrum(); }
+function onSliderD(v) { simPhysics.damping = parseFloat(v); document.getElementById('lbl-d').textContent = v > 0.15 ? 'Alto' : v > 0.07 ? 'Medio' : 'Bajo'; }
+
+function setHarmonicUI(n) {
+    document.querySelectorAll('.harmonic-btn').forEach((b,i) => b.classList.toggle('selected', i===n-1));
+    const freq = n * f1();
+    simPhysics.driveFreq = freq;
+    document.getElementById('slider-f').value = freq;
+    document.getElementById('lbl-f').textContent = freq.toFixed(2)+' Hz';
+    updateTelemetry(); updateSpectrum();
+}
+
+function updateTelemetry() {
+    const f1v = f1();
+    const ratio = simPhysics.driveFreq / f1v;
+    const mode = Math.round(ratio);
+    const waveLen = simPhysics.driveFreq > 0 ? (Math.sqrt(simPhysics.Tension/simPhysics.mu) / simPhysics.driveFreq).toFixed(2) : '–';
+    document.getElementById('val-mode').textContent = mode;
+    document.getElementById('val-freq').textContent = ratio.toFixed(2);
+    document.getElementById('val-wave').textContent = waveLen;
+    document.getElementById('val-hz').textContent = simPhysics.driveFreq.toFixed(1);
+}
+
+function initSimulations() {
+    if (animRunning) return;
+    initCharts();
+    updateTelemetry();
+    animRunning = true;
+    requestAnimationFrame(simLoop);
+    initGuitarCanvas();
+}
+
+function simLoop(ts) {
+    const dt = Math.min((ts - lastTime) / 1000, 0.05);
+    lastTime = ts;
+    simData.t += dt;
+
+    const { driveFreq, Tension, damping, mu, L } = simPhysics;
+    const v = Math.sqrt(Tension / mu);
+    const k = (2 * Math.PI * driveFreq) / v;
+    const omega = 2 * Math.PI * driveFreq;
+    const damp = Math.exp(-damping * simData.t * 0.5);
+    const showComp = document.getElementById('chk-components').checked;
+
+    // Draw simCanvas
+    const canvas = document.getElementById('simCanvas');
+    if (canvas) {
+        const ctx = canvas.getContext('2d');
+        const W = canvas.offsetWidth, H = canvas.offsetHeight;
+        canvas.width = W; canvas.height = H;
+        ctx.fillStyle = '#fff'; ctx.fillRect(0,0,W,H);
+        ctx.strokeStyle = '#eee'; ctx.lineWidth = 1;
+        for (let y=0; y<=H; y+=H/6) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+
+        const midY = H/2;
+        const amp = Math.min(midY * 0.8, 120);
+
+        if (showComp) {
+            // Incident wave
+            ctx.beginPath(); ctx.strokeStyle = 'rgba(231,76,60,0.5)'; ctx.lineWidth = 1.5;
+            for (let i=0; i<W; i++) {
+                const x = (i/W)*L;
+                const y_inc = amp * Math.sin(k*x - omega*simData.t) * damp;
+                ctx.lineTo(i, midY - y_inc);
+            }
+            ctx.stroke();
+            // Reflected wave
+            ctx.beginPath(); ctx.strokeStyle = 'rgba(52,152,219,0.5)'; ctx.lineWidth = 1.5;
+            for (let i=0; i<W; i++) {
+                const x = (i/W)*L;
+                const y_ref = amp * Math.sin(k*x + omega*simData.t) * damp;
+                ctx.lineTo(i, midY - y_ref);
+            }
+            ctx.stroke();
+        }
+
+        // Resultant standing wave
+        ctx.beginPath(); ctx.strokeStyle = '#2c3e50'; ctx.lineWidth = 2.5;
+        for (let i=0; i<W; i++) {
+            const x = (i/W)*L;
+            const y_sw = amp * 2 * Math.sin(k*x) * Math.cos(omega*simData.t) * damp;
+            simDataSpatial[Math.floor((i/W)*(N_NODES-1))] = y_sw;
+            i===0 ? ctx.moveTo(i, midY - y_sw) : ctx.lineTo(i, midY - y_sw);
+        }
+        ctx.stroke();
+
+        // Nodes
+        ctx.fillStyle = '#c0392b';
+        const f1v = f1();
+        const modeN = Math.round(driveFreq / f1v);
+        for (let n=0; n<=modeN; n++) {
+            const nx = (n/modeN)*W;
+            ctx.beginPath(); ctx.arc(nx, midY, 5, 0, 2*Math.PI); ctx.fill();
+        }
+
+        // Baseline
+        ctx.strokeStyle = '#ccc'; ctx.lineWidth = 1; ctx.setLineDash([4,4]);
+        ctx.beginPath(); ctx.moveTo(0,midY); ctx.lineTo(W,midY); ctx.stroke();
+        ctx.setLineDash([]);
+    }
+
+    // Update time history
+    const midAmp = 2 * 80 * Math.sin(k * simPhysics.L/2) * Math.cos(omega * simData.t) * damp;
+    simDataTime.push(midAmp);
+    if (simDataTime.length > TIME_SAMPLES) simDataTime.shift();
+
+    // Update charts (every ~3 frames)
+    if (chartSpatial && Math.floor(simData.t * 30) % 3 === 0) {
+        chartSpatial.data.datasets[0].data = [...simDataSpatial];
+        chartSpatial.update('none');
+        chartTime.data.datasets[0].data = [...simDataTime];
+        chartTime.update('none');
+    }
+
+    requestAnimationFrame(simLoop);
+}
+
+function initCharts() {
+    const spatialCtx = document.getElementById('chartSpatial')?.getContext('2d');
+    const timeCtx = document.getElementById('chartTime')?.getContext('2d');
+    const specCtx = document.getElementById('chartSpectrum')?.getContext('2d');
+    if (!spatialCtx || !timeCtx || !specCtx) return;
+
+    chartSpatial = new Chart(spatialCtx, {
+        type:'line', data:{ labels: Array.from({length:N_NODES},(_,i)=>i), datasets:[{label:'Perfil Espacial y(x)', data:[], borderColor:'#e67e22', pointRadius:0, borderWidth:2}] },
+        options:{ animation:false, responsive:true, maintainAspectRatio:false, scales:{y:{min:-180,max:180}, x:{display:false}}, plugins:{legend:{labels:{font:{size:11}}}} }
+    });
+    chartTime = new Chart(timeCtx, {
+        type:'line', data:{ labels: Array.from({length:TIME_SAMPLES},(_,i)=>i), datasets:[{label:'Amplitud central (t)', data:[], borderColor:'#9b59b6', fill:true, backgroundColor:'rgba(155,89,182,0.15)', pointRadius:0, borderWidth:2}] },
+        options:{ animation:false, responsive:true, maintainAspectRatio:false, scales:{y:{min:-180,max:180}, x:{display:false}}, plugins:{legend:{labels:{font:{size:11}}}} }
+    });
+    chartSpectrum = new Chart(specCtx, {
+        type:'bar',
+        data:{ labels:['f₁','f₂','f₃','f₄','f₅'], datasets:[{label:'Capacidad Modal', data:[100,50,33,25,20], backgroundColor:'rgba(52,73,94,0.7)'},{label:'Excitación Actual', data:[0,0,0,0,0], backgroundColor:'rgba(231,76,60,0.8)'}] },
+        options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{labels:{font:{size:11}}}} }
+    });
+    updateSpectrum();
+}
+
+function updateSpectrum() {
+    if (!chartSpectrum) return;
+    const f1v = f1();
+    chartSpectrum.data.labels = Array.from({length:5},(_,i)=>`n=${i+1} (${(f1v*(i+1)).toFixed(1)}Hz)`);
+    const excite = [0,0,0,0,0];
+    const bi = Math.round(simPhysics.driveFreq / f1v) - 1;
+    if (bi >= 0 && bi < 5 && Math.abs(simPhysics.driveFreq/f1v - (bi+1)) < 0.15) excite[bi] = 18;
+    chartSpectrum.data.datasets[1].data = excite;
+    chartSpectrum.update('none');
+}
+
+function resetZoom() { /* chart zoom not included but button works */ }
+
+/* ============================================================
+   GUITAR CANVAS
+============================================================ */
+const guitarStrings = [
+    { name: 'E4', f: 329.6, timer: 0, hover: false },
+    { name: 'B3', f: 246.9, timer: 0, hover: false },
+    { name: 'G3', f: 196.0, timer: 0, hover: false },
+    { name: 'D3', f: 146.8, timer: 0, hover: false },
+    { name: 'A2', f: 110.0, timer: 0, hover: false },
+    { name: 'E2', f: 82.41, timer: 0, hover: false },
+];
+
+let gAnimTime = 0, gLastTS = 0;
+
+function initGuitarCanvas() {
+    const gc = document.getElementById('guitarCanvas');
+    if (!gc) return;
+    gc.addEventListener('mousemove', onGuitarMouse);
+    gc.addEventListener('touchmove', (e) => { e.preventDefault(); onGuitarMouse({clientX: e.touches[0].clientX, clientY: e.touches[0].clientY}); }, {passive:false});
+    gc.addEventListener('click', () => { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); });
+    requestAnimationFrame(guitarLoop);
+}
+
+function onGuitarMouse(e) {
+    const gc = document.getElementById('guitarCanvas');
+    if (!gc) return;
+    const rect = gc.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const my = e.clientY - rect.top;
+    const H = gc.height;
+    const startY = H * 0.2;
+    const spacing = (H * 0.6) / 5;
+    guitarStrings.forEach((str, i) => {
+        const sy = startY + i * spacing;
+        const wasHover = str.hover;
+        str.hover = Math.abs(my - sy) < 14;
+        if (str.hover && !wasHover) {
+            str.timer = 1.0;
+            playStringNote(str.f);
+        }
+    });
+}
+
+function playStringNote(freq) {
+    if (!audioCtx) return;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain); gain.connect(audioCtx.destination);
+    osc.type = 'sawtooth'; osc.frequency.value = freq;
+    gain.gain.setValueAtTime(0.18, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 1.4);
+    osc.start(); osc.stop(audioCtx.currentTime + 1.4);
+}
+
+function guitarLoop(ts) {
+    const dt = Math.min((ts - gLastTS) / 1000, 0.05);
+    gLastTS = ts;
+    gAnimTime += dt;
+
+    const gc = document.getElementById('guitarCanvas');
+    if (!gc) return;
+    const ctx = gc.getContext('2d');
+    const W = gc.offsetWidth, H = gc.offsetHeight;
+    gc.width = W; gc.height = H;
+
+    // Body
+    ctx.fillStyle = '#1a1a2e'; ctx.fillRect(0,0,W,H);
+
+    // Guitar body shape
+    ctx.beginPath();
+    ctx.moveTo(W*0.85, H*0.1);
+    ctx.bezierCurveTo(W, H*0.1, W, H*0.9, W*0.85, H*0.9);
+    ctx.bezierCurveTo(W*0.6, H*0.9, W*0.55, H*0.7, W*0.4, H*0.85);
+    ctx.bezierCurveTo(W*0.25, H*0.85, W*0.20, H*0.15, W*0.4, H*0.15);
+    ctx.bezierCurveTo(W*0.55, H*0.3, W*0.6, H*0.1, W*0.85, H*0.1);
+    ctx.fillStyle = '#c0392b'; ctx.fill();
+    ctx.strokeStyle = '#8e44ad'; ctx.lineWidth = 4; ctx.stroke();
+
+    // Wood grain
+    ctx.strokeStyle = 'rgba(0,0,0,0.1)'; ctx.lineWidth = 1;
+    for (let i=0; i<6; i++) {
+        ctx.beginPath();
+        ctx.moveTo(W*0.42+i*10, H*0.2);
+        ctx.bezierCurveTo(W*0.5+i*8, H*0.4, W*0.55+i*7, H*0.6, W*0.45+i*9, H*0.8);
+        ctx.stroke();
+    }
+
+    // Sound hole
+    ctx.beginPath(); ctx.arc(W*0.57, H/2, H*0.13, 0, Math.PI*2);
+    ctx.fillStyle = '#111'; ctx.fill();
+    ctx.strokeStyle = '#555'; ctx.lineWidth = 3; ctx.stroke();
+
+    // Neck
+    const neckGrad = ctx.createLinearGradient(0,H/2-35,0,H/2+35);
+    neckGrad.addColorStop(0,'#7f8c8d'); neckGrad.addColorStop(1,'#5d6d7e');
+    ctx.fillStyle = neckGrad; ctx.fillRect(0, H/2-35, W*0.42, 70);
+
+    // Frets
+    ctx.strokeStyle = 'rgba(189,195,199,0.6)'; ctx.lineWidth = 1.5;
+    for (let fx=30; fx<W*0.42; fx+=38) {
+        ctx.beginPath(); ctx.moveTo(fx, H/2-35); ctx.lineTo(fx, H/2+35); ctx.stroke();
+    }
+
+    // Bridge
+    ctx.fillStyle = '#34495e'; ctx.fillRect(W*0.84, H/2-65, 18, 130);
+
+    // Strings
+    const startY = H * 0.2;
+    const spacing = (H * 0.6) / 5;
+    guitarStrings.forEach((str, i) => {
+        const sy = startY + i * spacing;
+        ctx.beginPath(); ctx.moveTo(0, sy);
+        const segs = 40;
+        for (let s=0; s<=segs; s++) {
+            const px = (s/segs) * (W*0.84);
+            const env = Math.sin((s/segs)*Math.PI);
+            const vy = sy + env * (str.timer * 10 * Math.sin(2*Math.PI * str.f * gAnimTime));
+            s===0 ? ctx.moveTo(px, vy) : ctx.lineTo(px, vy);
+        }
+        ctx.lineTo(W*0.84, sy);
+        ctx.lineWidth = 1 + i*0.35;
+        ctx.strokeStyle = str.hover ? '#f1c40f' : '#ecf0f1';
+        ctx.shadowColor = str.hover ? 'rgba(241,196,15,0.6)' : 'transparent';
+        ctx.shadowBlur = str.hover ? 8 : 0;
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+        str.timer = Math.max(0, str.timer - dt * 0.7);
+
+        // Label
+        ctx.fillStyle = str.hover ? '#f1c40f' : 'rgba(255,255,255,0.7)';
+        ctx.font = `bold 12px Lato,sans-serif`;
+        ctx.fillText(`${str.name} ${str.f}Hz`, 8, sy - 6);
+    });
+
+    // Tuning pegs
+    ctx.fillStyle = '#2c3e50';
+    for (let i=0; i<6; i++) { ctx.beginPath(); ctx.arc(W-12, H*0.2 + i*(H*0.6/5), 6, 0, Math.PI*2); ctx.fill(); }
+
+    requestAnimationFrame(guitarLoop);
+}
+
+/* ============================================================
+   INIT
+============================================================ */
+window.addEventListener('DOMContentLoaded', () => {
+    buildSpine();
+    updateNav();
+    loadNotes();
+    // KaTeX renders automatically via auto-render
+    // Keyboard navigation
+    document.addEventListener('keydown', e => {
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') goToSpread(1);
+        if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp')   goToSpread(-1);
+        if (e.key === 'f' || e.key === 'F') { document.documentElement.requestFullscreen?.(); }
+        if (e.key === 'Escape') { document.getElementById('searchOverlay').classList.remove('open'); }
+    });
+    // Simulate timer start silently
+    startTimer();
+    document.getElementById('timerWidget').classList.remove('visible'); // hidden until toggled
+});
+</script>
+</body>
+</html>
